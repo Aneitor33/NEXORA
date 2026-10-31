@@ -1,0 +1,136 @@
+name: Pelispedia Scraper
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+    inputs:
+      fase:
+        description: "Fase a ejecutar (auto = todo en orden)"
+        required: true
+        default: auto
+        type: choice
+        options:
+          - auto
+          - datos
+          - generos
+          - discover
+          - servers
+      workers:
+        description: "Workers HTTP (fase datos)"
+        required: true
+        default: "20"
+        type: string
+      pw_workers:
+        description: "Workers Playwright (jsPass / discover / servers modo lento)"
+        required: true
+        default: "5"
+        type: string
+      chunk:
+        description: "Títulos por chunk (checkpoint)"
+        required: true
+        default: "2000"
+        type: string
+      secciones:
+        description: "Secciones (vacío = todas): peliculas,series,animes,dorama"
+        required: false
+        type: string
+      max_titulos:
+        description: "Tope de títulos por run (vacío = sin tope)"
+        required: false
+        type: string
+      solo_empaquetar:
+        description: "SALTAR scraper - solo índice + shards del catalog existente"
+        required: true
+        default: "no"
+        type: choice
+        options:
+          - "no"
+          - "si"
+
+concurrency:
+  group: pelispedia-scraper
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar dependencias
+        run: |
+          npm install --no-audit --no-fund
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Configurar git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p resultados
+
+      - name: 1/5 Fase datos (catálogo + temporadas JS, checkpoints)
+        if: ${{ github.event.inputs.solo_empaquetar != 'si' && (github.event.inputs.fase == 'auto' || github.event.inputs.fase == 'datos' || github.event.inputs.fase == 'generos') }}
+        run: |
+          for i in $(seq 1 200); do
+            EXTRA=""
+            [ -n "${{ github.event.inputs.secciones }}" ] && EXTRA="$EXTRA --secciones=${{ github.event.inputs.secciones }}"
+            [ -n "${{ github.event.inputs.max_titulos }}" ] && EXTRA="$EXTRA --max-titulos=${{ github.event.inputs.max_titulos }}"
+            FASE_CMD="--fase=${{ github.event.inputs.fase || 'datos' }}"
+            [ "${{ github.event.inputs.fase }}" = "auto" ] && FASE_CMD="--fase=datos"
+            OUT=$(node pelispedia_scraper.js $FASE_CMD \
+                    --workers=${{ github.event.inputs.workers || '20' }} \
+                    --pw-workers=${{ github.event.inputs.pw_workers || '5' }} \
+                    --max=${{ github.event.inputs.chunk || '2000' }} $EXTRA 2>&1)
+            echo "$OUT" | grep -E "sitemap|PENDIENTES|CHUNK|COMPLETO|jsPass|💾|⚠|🧪|reparando|reparados" | tail -14
+            git add -A resultados public/data/catalog-pelispedia.json public/data/catalog-pelispedia.json.partial 2>/dev/null || true
+            git commit -m "[skip ci] checkpoint datos pelispedia $i" || true
+            for t in 1 2 3 4 5; do git pull --rebase --autostash && git push && break || sleep 10; done
+            echo "$OUT" | grep -q "PENDIENTES_DATOS:0" && break
+          done
+
+      - name: 2/5 Descubrir plantillas de servidor
+        if: ${{ github.event.inputs.solo_empaquetar != 'si' && github.event.inputs.fase != 'servers' }}
+        run: |
+          if [ ! -f pelispedia_discovery.json ] || [ "${{ github.event.inputs.fase }}" = "discover" ]; then
+            node pelispedia_scraper.js --discover --pw-workers=${{ github.event.inputs.pw_workers || '5' }} || echo "⚠️ discover falló (la fase servers lo reintentará)" 
+            git add -A pelispedia_discovery.json && git commit -m "discovery pelispedia" || true
+            for t in 1 2 3 4 5; do git pull --rebase --autostash && git push && break || sleep 10; done
+          fi
+
+      - name: 3/5 Fase servers (patrón o Playwright, checkpoints)
+        if: ${{ github.event.inputs.solo_empaquetar != 'si' && (github.event.inputs.fase == 'auto' || github.event.inputs.fase == 'servers') }}
+        run: |
+          [ -f pelispedia_discovery.json ] || node pelispedia_scraper.js --discover --pw-workers=${{ github.event.inputs.pw_workers || '5' }}
+          for i in $(seq 1 400); do
+            OUT=$(node pelispedia_scraper.js --fase=servers \
+                    --pw-workers=${{ github.event.inputs.pw_workers || '5' }} \
+                    --max=${{ github.event.inputs.chunk || '2000' }} 2>&1)
+            echo "$OUT" | grep -E "PENDIENTES|CHUNK|COMPLETO|⚡|🐢|💾|⚠" | tail -10
+            git add -A public/data/catalog-pelispedia.json public/data/catalog-pelispedia.json.partial pelispedia_discovery.json 2>/dev/null || true
+            git commit -m "[skip ci] checkpoint servers pelispedia $i" || true
+            for t in 1 2 3 4 5; do git pull --rebase --autostash && git push && break || sleep 10; done
+            echo "$OUT" | grep -q "PENDIENTES:0" && break
+          done
+
+      - name: 4/5 Índice lite + shards
+        run: |
+          node split-catalog.js public/data/catalog-pelispedia.json
+          node shard-pack.js catalog-pelispedia
+
+      - name: 5/5 Índice maestro
+        run: node build-master-index.js
+
+      - name: Commit final
+        run: |
+          git add -A resultados public/data/catalog-pelispedia.json \
+                  public/data/catalog-pelispedia-index.json \
+                  public/data/catalog-pelispedia-details \
+                  public/data/catalog-index.json pelispedia_discovery.json
+          git commit -m "Scraping pelispedia ${{ github.run_number }} (completo)" || true
+          for t in 1 2 3 4 5; do git pull --rebase --autostash && git push && break || echo "reintento push" && sleep 10; done

@@ -1,0 +1,55 @@
+# ══════════════════════════════════════════════
+#  DORAMAS — doramasmp4.cyou
+#  Catálogo: public/data/catalog-doramas.json
+#  + índice lite y fichas por dorama
+# ══════════════════════════════════════════════
+name: Sincronizar catálogo Doramas
+
+on:
+  schedule:
+    - cron: '50 */6 * * *'      # cada 6h, minuto 50
+  workflow_dispatch:
+
+concurrency:
+  group: sync-doramas
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Sincronizar doramas
+        env:
+          WORKERS: '5'
+          POLITENESS_MS: '1500'
+          MAX_EPISODE_CRAWLS: '20000'
+          MAX_RUNTIME_MINUTES: '330'
+          FETCH_TIMEOUT_MS: '120000'
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: node syncdoramas.js
+
+      - name: Generar índice lite y fichas
+        if: always()
+        run: node split-catalog.js public/data/catalog-doramas.json
+
+      - name: Guardar catálogo
+        if: always()
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -A public/data/
+          git diff --staged --quiet || git commit -m "sync(doramas): actualizar catálogo"
+          git pull --rebase origin main
+          git push
