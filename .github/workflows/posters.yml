@@ -1,12 +1,11 @@
 # ══════════════════════════════════════════════
 #  PORTADAS — descarga pósters de TMDB/AniList
 #  Cada catálogo corre en su PROPIO trabajo.
-#  Tras cada pasada regenera el ÍNDICE LITE y las
-#  fichas (shard-pack para los catálogos con shards:
-#  debe coincidir con SHARDED_CATS de app.js) y hace
-#  commit.
-#  Requiere: secret TMDB_API_KEY (gratis en
-#  themoviedb.org)
+#  NEXORA FIX (2026-10-31): matrix limitado a los catálogos que existen en este repo
+#  (donghuaworld / peliculas / donghuacli no están → sus trabajos fallaban). El
+#  empaquetado posterior (shard-pack/split-catalog) se sustituye por build-index.mjs,
+#  que además regenera los nx-* con las nuevas imágenes.
+#  Requiere: secret TMDB_API_KEY (gratis en themoviedb.org)
 # ══════════════════════════════════════════════
 name: Sincronizar portadas
 
@@ -20,7 +19,7 @@ on:
         required: false
         default: '0'
       catalog:
-        description: 'all | donghualife | donghuasub | donghuaworld | peliculas | doramas | donghuacli'
+        description: 'all | donghualife | doramas'
         required: false
         default: 'all'
 
@@ -36,7 +35,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        catalog: [donghualife, donghuasub, donghuaworld, peliculas, doramas, donghuacli]
+        catalog: [donghualife, doramas]
     permissions:
       contents: write
     steps:
@@ -64,21 +63,10 @@ jobs:
             CATALOG=$CATALOG node poster-sync.js > /tmp/posters-ronda-$round.log 2>&1 || true
             tail -n 40 /tmp/posters-ronda-$round.log
 
-            # Regenerar el ÍNDICE LITE y las fichas (lo que lee la web).
-            # OJO: los catálogos de SHARDED_CATS (app.js) deben regenerarse
-            # con shard-pack (agrupa en 64 shards y BORRA las fichas sueltas).
-            # Con split-catalog recrearíamos miles de archivos y reventaríamos
-            # el límite de 20.000 archivos de Cloudflare Pages.
-            case "$CATALOG" in
-              donghualife|youtubefilms|pelispedia)
-                node shard-pack.js "catalog-$CATALOG" full
-                ;;
-              *)
-                node split-catalog.js "public/data/catalog-$CATALOG.json"
-                ;;
-            esac
+            # Índice canónico NEXORA (sustituye a shard-pack/split-catalog)
+            node scripts/build-index.mjs || true
 
-            git add -A public/data public/img/posters
+            git add -A public/data public/img/posters import/state.json
             if ! git diff --staged --quiet; then
               git commit -m "sync(posters): $CATALOG (pasada $round)"
               for i in 1 2 3 4 5; do
