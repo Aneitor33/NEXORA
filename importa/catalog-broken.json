@@ -1,8 +1,0 @@
-{
-  "_note": "FIXTURE DE PRUEBA: simula un sync fallido (meta declara 5000, array vacío). El importador debe RECHAZARLO y no marcar nada como desaparecido.",
-  "meta": { "version": 1, "source": "https://broken.test", "catalogTag": "broken", "syncedAt": "2026-10-31T04:00:00Z", "items": 5000 },
-  "genres": [],
-  "series": [],
-  "seasons": [],
-  "episodes": []
-}
