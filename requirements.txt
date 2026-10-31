@@ -1,4 +1,8 @@
 # Dependencias del scraper Python sync-dramas-yt.py (workflow dramas-yt-sync)
-# Si el workflow falla por un modulo ausente, su error indica cual: anadelo aqui.
+# NEXORA FIX (2026-10-31): yt-dlp es OBLIGATORio (el scraper lo llama como subproceso;
+# sin el, list_channel_series() devuelve 0 playlists y el sync aborta). Pillow genera
+# los posters locales en public/img/posters-dramasyt.
 requests>=2.31.0
 beautifulsoup4>=4.12.0
+yt-dlp>=2024.8.0
+Pillow>=10.0.0

@@ -363,10 +363,57 @@ const Views = {
         const res = $('#ia-results'); res.replaceChildren();
         if (d.picks?.length) {
           res.appendChild(row('Recomendado para ti', d.picks.map(p => Catalog.items.find(i => i.id === p.id)).filter(Boolean)));
-          d.picks.forEach(p => { const it = Catalog.items.find(i => i.id === p.id);
-            if (it) res.querySelectorAll('.nx-card__title').forEach(() => {}); });
         }
       } catch { box.lastElementChild.remove(); addMsg('No se pudo contactar con el asistente (¿está en Cloudflare Pages con functions?).', false); }
+    });
+  },
+
+  async settings(view) {
+    const c = Catalog.counts();
+    let rep = null;
+    try { rep = await (await fetch('public/data/nx-report.json')).json(); } catch {}
+    const srcRows = rep ? Object.entries(rep.sources || {}).map(([tag, s]) =>
+      `<tr><td style="padding:6px 10px;border-bottom:1px solid var(--nx-line)">${esc(tag)}</td>
+       <td style="padding:6px 10px;border-bottom:1px solid var(--nx-line)">${esc(s.estado || '—')}</td>
+       <td style="padding:6px 10px;border-bottom:1px solid var(--nx-line)">${s.actual ?? '—'}</td></tr>`).join('') : '';
+    view.insertAdjacentHTML('beforeend', `<div class="nx-viewhead"><h1>Ajustes</h1><p>Estado del catálogo y preferencias locales.</p></div>
+    <div class="nx-detailbody" style="padding-top:0">
+      <h2 class="nx-row__title" style="margin:0 0 10px">Catálogo</h2>
+      <dl class="nx-kv">
+        <div><dt>Modo</dt><dd>${Catalog.mode === 'canonical' ? 'Canónico (nx-*)' : 'Demo'}</dd></div>
+        <div><dt>Títulos únicos</dt><dd>${c ? c.canonicos_unicos : Catalog.items.length}</dd></div>
+        <div><dt>Registros de fuente</dt><dd>${c ? c.records_originales : '—'}</dd></div>
+        <div><dt>Pendientes de revisión</dt><dd>${c ? c.pendientes_revision : '—'}</dd></div>
+        <div><dt>Importado</dt><dd>${rep ? fmtDate(rep.generatedAt) : '—'}</dd></div>
+      </dl>
+      ${srcRows ? `<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:24px">${srcRows}</table>` : ''}
+      <h2 class="nx-row__title" style="margin:0 0 10px">Reproducción</h2>
+      <div class="nx-filters" style="padding:0 0 20px">
+        <button class="nx-chip" id="setAutonext" aria-pressed="${localStorage.getItem('nx.autonext') === '1'}">Autoplay siguiente episodio</button>
+      </div>
+      <h2 class="nx-row__title" style="margin:0 0 10px">Aplicación</h2>
+      <div class="nx-filters" style="padding:0">
+        <button class="nx-chip" id="setInstall">Instalar app (PWA)</button>
+        <button class="nx-chip" id="setClear">Borrar datos locales (favoritos, progreso, historial)</button>
+      </div>
+      <p class="nx-empty" style="text-align:left;padding:18px 0">La sincronización entre dispositivos (cuenta) se activará cuando conectemos el backend; los datos actuales viven solo en este dispositivo.</p>
+    </div>`);
+    $('#setAutonext', view).addEventListener('click', e => {
+      const on = localStorage.getItem('nx.autonext') === '1';
+      localStorage.setItem('nx.autonext', on ? '0' : '1');
+      e.currentTarget.setAttribute('aria-pressed', String(!on));
+      toast(!on ? 'Autoplay activado' : 'Autoplay desactivado');
+    });
+    $('#setClear', view).addEventListener('click', () => {
+      if (confirm('¿Borrar favoritos, progreso e historial de este dispositivo?')) {
+        localStorage.removeItem(Lib.key); toast('Datos locales borrados'); route();
+      }
+    });
+    let deferred = null;
+    window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; }, { once: true });
+    $('#setInstall', view).addEventListener('click', async () => {
+      if (deferred) { deferred.prompt(); await deferred.userChoice; deferred = null; }
+      else toast('Si la app es instalable, usa el menú del navegador → "Añadir a pantalla de inicio".');
     });
   },
 
@@ -389,7 +436,7 @@ async function route() {
     else if (path === '/explorar')        await Views.explore(view);
     else if (path === '/biblioteca')      await Views.library(view);
     else if (path === '/ia')              await Views.ia(view);
-    else if (path === '/ajustes')         await Views.placeholder(view, 'Ajustes', 'Tema, autoplay y sincronización entre dispositivos: siguiente iteración.');
+    else if (path === '/ajustes')         await Views.settings(view);
     else if (seg[0] === 'titulo')         await Views.title(view, { id: decodeURIComponent(seg[1] || '') });
     else if (seg[0] === 'buscar')         await Views.search(view, { q: new URLSearchParams(query).get('q') || '' });
     else {
