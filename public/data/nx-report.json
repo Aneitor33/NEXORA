@@ -1,18 +1,59 @@
 {
-  "generatedAt": "2026-10-31T03:45:22.817Z",
+  "generatedAt": "2026-10-31T15:13:18.932Z",
   "sources": {
-    "broken": {
-      "tag": "broken",
-      "file": "catalog-broken.json",
+    "donghualife": {
+      "tag": "donghualife",
+      "file": "catalog-donghualife.json",
       "lite": false,
-      "declared": 5000,
-      "actual": 0,
-      "syncedAt": "2026-10-31T04:00:00Z",
+      "declared": null,
+      "actual": 422,
+      "syncedAt": "2026-10-31T15:13:18.741Z",
       "estado": "RECHAZADO",
       "reasons": [
-        "catálogo sin entradas (series vacío)",
-        "conteo discrepante: meta declara 5000, hay 0"
+        "meta.catalogTag ausente"
       ]
+    },
+    "doramas-failures-v2": {
+      "tag": "doramas-failures-v2",
+      "file": "catalog-doramas-failures-v2.json",
+      "lite": false,
+      "declared": null,
+      "actual": 0,
+      "syncedAt": null,
+      "estado": "RECHAZADO",
+      "reasons": [
+        "meta.catalogTag ausente",
+        "catálogo sin entradas (series vacío)"
+      ]
+    },
+    "doramas-progress": {
+      "tag": "doramas-progress",
+      "file": "catalog-doramas-progress.json",
+      "lite": false,
+      "declared": null,
+      "actual": 0,
+      "syncedAt": null,
+      "estado": "RECHAZADO",
+      "reasons": [
+        "meta.catalogTag ausente",
+        "catálogo sin entradas (series vacío)"
+      ]
+    },
+    "doramas": {
+      "tag": "doramas",
+      "file": "catalog-doramas.json",
+      "lite": false,
+      "declared": null,
+      "actual": 193,
+      "syncedAt": "2026-10-31T13:09:01.496Z",
+      "estado": "RECHAZADO",
+      "reasons": [
+        "meta.catalogTag ausente"
+      ]
+    },
+    "catalog-broken": {
+      "file": "catalog-broken.json",
+      "estado": "OMITIDO (fixture de prueba)"
     },
     "donghuasub": {
       "tag": "donghuasub",
@@ -21,60 +62,73 @@
       "declared": 60,
       "actual": 60,
       "syncedAt": "2026-10-31T00:22:06.473Z",
-      "estado": "ACEPTADO",
-      "generosSinMapear": [],
-      "generosSaturadosIgnorados": [],
-      "servidores": {
-        "serversEmpty": 0,
-        "variantA": 0,
-        "variantB": 0
-      },
-      "conGeneresPct": 0
+      "estado": "RECHAZADO",
+      "reasons": [
+        "syncedAt (2026-10-31T00:22:06.473Z) no es posterior al anterior (2026-10-31T00:22:06.473Z)"
+      ]
     },
-    "testlat": {
-      "tag": "testlat",
+    "catalog-testlat": {
       "file": "catalog-testlat.json",
-      "lite": false,
-      "declared": 5,
-      "actual": 5,
-      "syncedAt": "2026-10-31T04:00:00Z",
-      "estado": "ACEPTADO",
-      "generosSinMapear": [],
-      "generosSaturadosIgnorados": [],
-      "servidores": {
-        "serversEmpty": 1,
-        "variantA": 1,
-        "variantB": 1
-      },
-      "conGeneresPct": 80
+      "estado": "OMITIDO (fixture de prueba)"
     }
   },
   "conteos": {
-    "records_originales": 64,
+    "records_originales": 0,
     "aceptados_por_fuente": {
-      "broken": 0,
-      "donghuasub": 60,
-      "testlat": 5
+      "donghualife": 422,
+      "doramas-failures-v2": 0,
+      "doramas-progress": 0,
+      "doramas": 193,
+      "donghuasub": 60
     },
-    "matches_entre_fuentes": 1,
+    "matches_entre_fuentes": 0,
     "fusiones_automaticas": 0,
-    "mismos_hash_unificados": 1,
+    "mismos_hash_unificados": 0,
     "absorbidos_por_fusion": 0,
-    "canonicos_unicos": 63,
-    "pendientes_revision": 1,
-    "rechazados": 1
+    "canonicos_unicos": 0,
+    "pendientes_revision": 0,
+    "rechazados": 5
   },
   "rechazados": [
     {
-      "tag": "broken",
-      "file": "catalog-broken.json",
+      "tag": "donghualife",
+      "file": "catalog-donghualife.json",
       "reasons": [
-        "catálogo sin entradas (series vacío)",
-        "conteo discrepante: meta declara 5000, hay 0"
+        "meta.catalogTag ausente"
+      ]
+    },
+    {
+      "tag": "doramas-failures-v2",
+      "file": "catalog-doramas-failures-v2.json",
+      "reasons": [
+        "meta.catalogTag ausente",
+        "catálogo sin entradas (series vacío)"
+      ]
+    },
+    {
+      "tag": "doramas-progress",
+      "file": "catalog-doramas-progress.json",
+      "reasons": [
+        "meta.catalogTag ausente",
+        "catálogo sin entradas (series vacío)"
+      ]
+    },
+    {
+      "tag": "doramas",
+      "file": "catalog-doramas.json",
+      "reasons": [
+        "meta.catalogTag ausente"
+      ]
+    },
+    {
+      "tag": "donghuasub",
+      "file": "catalog-donghuasub.json",
+      "reasons": [
+        "syncedAt (2026-10-31T00:22:06.473Z) no es posterior al anterior (2026-10-31T00:22:06.473Z)"
       ]
     }
   ],
-  "titulosInvalidosOmitidos": 1,
+  "titulosInvalidosOmitidos": 0,
   "enriquecimiento": {
     "shape": "object",
     "entries": 3

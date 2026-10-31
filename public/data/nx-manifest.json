@@ -1,35 +1,36 @@
 {
-  "generatedAt": "2026-10-31T03:45:22.817Z",
-  "sources": [
-    "donghuasub",
-    "testlat"
-  ],
+  "generatedAt": "2026-10-31T15:13:18.932Z",
+  "sources": [],
+  "detailsMode": "files",
   "conteos": {
-    "records_originales": 64,
+    "records_originales": 0,
     "aceptados_por_fuente": {
-      "broken": 0,
-      "donghuasub": 60,
-      "testlat": 5
+      "donghualife": 422,
+      "doramas-failures-v2": 0,
+      "doramas-progress": 0,
+      "doramas": 193,
+      "donghuasub": 60
     },
-    "matches_entre_fuentes": 1,
+    "matches_entre_fuentes": 0,
     "fusiones_automaticas": 0,
-    "mismos_hash_unificados": 1,
+    "mismos_hash_unificados": 0,
     "absorbidos_por_fusion": 0,
-    "canonicos_unicos": 63,
-    "pendientes_revision": 1,
-    "rechazados": 1
+    "canonicos_unicos": 0,
+    "pendientes_revision": 0,
+    "rechazados": 5
   },
   "canonicalIds": [
     {
       "id": "nx:hash:027a65960ca5",
       "t": "Ancient Martial Artist in the City",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "ancient-martial-artist-in-the-city"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -39,13 +40,14 @@
     {
       "id": "nx:hash:0d657f51cf2e",
       "t": "Ancient God Sovereign",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "ancient-god-sovereign"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -55,13 +57,14 @@
     {
       "id": "nx:hash:172bb112cc2a",
       "t": "GuAn",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "guan"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -71,13 +74,14 @@
     {
       "id": "nx:hash:188d475f4330",
       "t": "A Record Of Mortal’s Journey To Immortality Season 5",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "a-record-of-mortals-journey-to-immortality-season-5"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -87,13 +91,14 @@
     {
       "id": "nx:hash:1f5a549b7669",
       "t": "GodTier Scammer: The Whole Server Begs Me to Stop!",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "godtier-scammer-the-whole-server-begs-me-to-stop"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -103,13 +108,14 @@
     {
       "id": "nx:hash:2385a1fc389d",
       "t": "Undead Calamity: I Raise My Hand Millions of Bones Rise",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "undead-calamity-i-raise-my-hand-millions-of-bones-rise"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -119,13 +125,14 @@
     {
       "id": "nx:hash:241653481ca8",
       "t": "Against the Gods 3D",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "against-the-gods-3d"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -135,13 +142,14 @@
     {
       "id": "nx:hash:2835f41fad4d",
       "t": "Apocalypse Arrives! I Save the World Through Gaming",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "apocalypse-arrives-i-save-the-world-through-gaming"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -151,13 +159,14 @@
     {
       "id": "nx:hash:285116906a7c",
       "t": "The Villainous Senior Brother: Unpredictable Junior Sisters",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "the-villainous-senior-brother-unpredictable-junior-sisters"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -167,13 +176,14 @@
     {
       "id": "nx:hash:2fe036c83ca2",
       "t": "Infinite Skill Amplification I Don’t Want to Be a Support Anymore",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "infinite-skill-amplification-i-dont-want-to-be-a-support-anymore"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -183,13 +193,14 @@
     {
       "id": "nx:hash:36a447d284d4",
       "t": "Beyond Time’s Gaze",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "beyond-times-gaze"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -199,13 +210,14 @@
     {
       "id": "nx:hash:372e816d5bda",
       "t": "Frozen Apocalypse: Building the Perfect Territory",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "frozen-apocalypse-building-the-perfect-territory"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -215,13 +227,14 @@
     {
       "id": "nx:hash:388055a47295",
       "t": "A Will Eternal Season 4",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "a-will-eternal-season-4"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -231,13 +244,14 @@
     {
       "id": "nx:hash:3a553704804b",
       "t": "Shrounding The Heavens",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "shrounding-the-heavens"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -247,13 +261,14 @@
     {
       "id": "nx:hash:3d3c90465ceb",
       "t": "Apocalypse Game Show: How One Man Defied the Deadly Trials",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "apocalypse-game-show-how-one-man-defied-the-deadly-trials"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -263,13 +278,14 @@
     {
       "id": "nx:hash:3f8ec2b99031",
       "t": "Ancient Revenge: Broken Wind",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "ancient-revenge-broken-wind"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -279,13 +295,14 @@
     {
       "id": "nx:hash:406eedf2f1ad",
       "t": "Alien Prison Tyrant: My Shadow Can Evolve Infinitely",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "alien-prison-tyrant-my-shadow-can-evolve-infinitely"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -295,13 +312,14 @@
     {
       "id": "nx:hash:4311bd979dbd",
       "t": "Martial Master",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "martial-master"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -311,13 +329,14 @@
     {
       "id": "nx:hash:49f776a9aefa",
       "t": "The Rise of the Legendary Death Walker",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "the-rise-of-the-legendary-death-walker"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -327,13 +346,14 @@
     {
       "id": "nx:hash:4c9aa1d7e2af",
       "t": "Beast Taming for All: Awakening a Mythical Talent From the Start",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "beast-taming-for-all-awakening-a-mythical-talent-from-the-start"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -343,7 +363,7 @@
     {
       "id": "nx:hash:53e4789b3d1f",
       "t": "Guerra de dragones",
-      "st": "finished",
+      "st": "gone",
       "src": [
         {
           "tag": "testlat",
@@ -354,6 +374,7 @@
           "id": "testlat:b"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T04:00:00Z",
@@ -363,13 +384,14 @@
     {
       "id": "nx:hash:567fc4b39617",
       "t": "Supreme God Emperor",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "supreme-god-emperor"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -379,13 +401,14 @@
     {
       "id": "nx:hash:5806f87c6041",
       "t": "I’m Stuck on the Same Day for a Thousand Years",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "im-stuck-on-the-same-day-for-a-thousand-years"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -395,13 +418,14 @@
     {
       "id": "nx:hash:5ca6fe314416",
       "t": "Awakening the God Slaying Bloodline: Three Realms Battle Royale",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "awakening-the-god-slaying-bloodline-three-realms-battle-royale"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -411,13 +435,14 @@
     {
       "id": "nx:hash:5de7e8fc52ae",
       "t": "Anti Routine Godslayer I Refuse to Choose an SSS Class Job",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "anti-routine-godslayer-i-refuse-to-choose-an-sss-class-job"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -427,13 +452,14 @@
     {
       "id": "nx:hash:5e44dfb22ba1",
       "t": "Apocalyptic Awakening I Am The Strongest Boss",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "apocalyptic-awakening-i-am-the-strongest-boss"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -443,13 +469,14 @@
     {
       "id": "nx:hash:5f0b6b03761c",
       "t": "Apocalyptic King: Trillions at the Start The Goddess Regrets It",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "apocalyptic-king-trillions-at-the-start-the-goddess-regrets-it"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -459,13 +486,14 @@
     {
       "id": "nx:hash:5f5d8d0b4b76",
       "t": "Rebirth in the Supernatural Apocalypse: Billionaire Turns the Game Upside Down!",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "rebirth-in-the-supernatural-apocalypse-billionaire-turns-the-game-upside-down"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -475,13 +503,14 @@
     {
       "id": "nx:hash:6d14fec59a63",
       "t": "Apocalypse Gold Hunter I Move Gold Bricks in The Apocalypse",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "apocalypse-gold-hunter-i-move-gold-bricks-in-the-apocalypse"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -491,13 +520,14 @@
     {
       "id": "nx:hash:7455cbd64d90",
       "t": "Duelo de titanes",
-      "st": "airing",
+      "st": "gone",
       "src": [
         {
           "tag": "testlat",
           "id": "testlat:d"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T04:00:00Z",
@@ -507,13 +537,14 @@
     {
       "id": "nx:hash:7f88a8a67c1c",
       "t": "Battle Through the Heavens Season 5",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "battle-through-the-heavens-season-5"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -523,13 +554,14 @@
     {
       "id": "nx:hash:81703072122d",
       "t": "20,000 Years of Physical Cultivation",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "20000-years-of-physical-cultivation"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -539,13 +571,14 @@
     {
       "id": "nx:hash:83869b264bb1",
       "t": "Duelo de titanes",
-      "st": "airing",
+      "st": "gone",
       "src": [
         {
           "tag": "testlat",
           "id": "testlat:c"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T04:00:00Z",
@@ -555,13 +588,14 @@
     {
       "id": "nx:hash:8e34ffa86450",
       "t": "The Global Awakening I Ushered in the Era of Mythical Beasts",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "the-global-awakening-i-ushered-in-the-era-of-mythical-beasts"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -571,13 +605,14 @@
     {
       "id": "nx:hash:90598d367cf9",
       "t": "Jade Dynasty Season 4",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "jade-dynasty-season-4"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -587,13 +622,14 @@
     {
       "id": "nx:hash:932113042e5a",
       "t": "Renegade Immortal (Xian Ni)",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "renegade-immortal-xian-ni"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -603,13 +639,14 @@
     {
       "id": "nx:hash:9745fbe25265",
       "t": "Ancient War Soul",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "ancient-war-soul"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -619,13 +656,14 @@
     {
       "id": "nx:hash:9cda5a78c7fe",
       "t": "One Hundred Thousand Years of Qi Refining",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "one-hundred-thousand-years-of-qi-refining"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -635,13 +673,14 @@
     {
       "id": "nx:hash:a10a6d89c975",
       "t": "Aliens Among Immortals",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "aliens-among-immortals"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -651,13 +690,14 @@
     {
       "id": "nx:hash:a2a668dc8cea",
       "t": "A Good Day to Ascend",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "a-good-day-to-ascend"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -667,13 +707,14 @@
     {
       "id": "nx:hash:a6bca020579f",
       "t": "Oriental Martial Academy",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "oriental-martial-academy"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -683,13 +724,14 @@
     {
       "id": "nx:hash:ab5553ddac32",
       "t": "Swallowed Star Warrior of the Galaxy",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "swallowed-star-warrior-of-the-galaxy"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -699,13 +741,14 @@
     {
       "id": "nx:hash:acd07fdd2fb6",
       "t": "Obra sin géneros",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "testlat",
           "id": "testlat:e"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T04:00:00Z",
@@ -715,13 +758,14 @@
     {
       "id": "nx:hash:ae3dbb5203da",
       "t": "My Wife and I Dominate the Three Realms",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "my-wife-and-i-dominate-the-three-realms"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -731,13 +775,14 @@
     {
       "id": "nx:hash:afabbf90e255",
       "t": "God Level Boss Summoner: My Army of Divine Beasts Dominates the Apocalypse",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "god-level-boss-summoner-my-army-of-divine-beasts-dominates-the-apocalypse"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -747,13 +792,14 @@
     {
       "id": "nx:hash:be2cda34ffc5",
       "t": "Under The Gate",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "under-the-gate"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -763,13 +809,14 @@
     {
       "id": "nx:hash:c75abfc3ac7c",
       "t": "Spiritual Realm Walker",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "spiritual-realm-walker"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -779,13 +826,14 @@
     {
       "id": "nx:hash:d4303a005340",
       "t": "Avenger Returns Zombie Apocalypse",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "avenger-returns-zombie-apocalypse"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -795,13 +843,14 @@
     {
       "id": "nx:hash:d507b88f59cc",
       "t": "Lingwu Continent",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "lingwu-continent"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -811,13 +860,14 @@
     {
       "id": "nx:hash:d622696aaed1",
       "t": "Divine Pet Evolution",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "divine-pet-evolution"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -827,13 +877,14 @@
     {
       "id": "nx:hash:daa60d64751e",
       "t": "Back To Rule Again: Ruling the Apocalypse Once Again",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "back-to-rule-again-ruling-the-apocalypse-once-again"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -843,13 +894,14 @@
     {
       "id": "nx:hash:dd4d0705a86d",
       "t": "Apotheosis (Become a God) Season 2",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "apotheosis-become-a-god-season-2"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -859,13 +911,14 @@
     {
       "id": "nx:hash:e5f32e994120",
       "t": "Arrival of the Divine Ring: From Cleaner to Hero in Two Worlds",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "arrival-of-the-divine-ring-from-cleaner-to-hero-in-two-worlds"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -875,13 +928,14 @@
     {
       "id": "nx:hash:e9759a9109ff",
       "t": "The Legend of the Old Snake Cultivating Immortality",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "the-legend-of-the-old-snake-cultivating-immortality"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -891,13 +945,14 @@
     {
       "id": "nx:hash:eac10d04adba",
       "t": "Aura Revival: I Get a New Skill Everyday",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "aura-revival-i-get-a-new-skill-everyday"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -907,13 +962,14 @@
     {
       "id": "nx:hash:eacbfa4177fa",
       "t": "Xianwu Emperor",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "xianwu-emperor"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -923,13 +979,14 @@
     {
       "id": "nx:hash:f03f3e5fa52b",
       "t": "I Just want to Play Game Quietly",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "i-just-want-to-play-game-quietly"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -939,13 +996,14 @@
     {
       "id": "nx:hash:f745d58e38b6",
       "t": "Apocalypse Smuggler: I Trade Spicy Strips for Gold Bricks",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "apocalypse-smuggler-i-trade-spicy-strips-for-gold-bricks"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -955,13 +1013,14 @@
     {
       "id": "nx:hash:f85e9dbd1e73",
       "t": "Ancient Supremacy",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "ancient-supremacy"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -971,13 +1030,14 @@
     {
       "id": "nx:hash:fbb19530622c",
       "t": "Rebirth of the Villain: The Legend of Chu Xiu",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "rebirth-of-the-villain-the-legend-of-chu-xiu"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -987,13 +1047,14 @@
     {
       "id": "nx:hash:fbffa574a151",
       "t": "100 Million Lives Rewarded At The Beginning",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "100-million-lives-rewarded-at-the-beginning"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -1003,13 +1064,14 @@
     {
       "id": "nx:hash:fc8206c5c8f6",
       "t": "Age Of Terror",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "age-of-terror"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
@@ -1019,13 +1081,14 @@
     {
       "id": "nx:hash:ff24d3cab72d",
       "t": "The Eternal Supreme Li Yunxiao",
-      "st": "unconfirmed",
+      "st": "gone",
       "src": [
         {
           "tag": "donghuasub",
           "id": "the-eternal-supreme-li-yunxiao"
         }
       ],
+      "goneSince": 1793459599081,
       "dates": {
         "release": null,
         "added": "2026-10-31T00:22:06.473Z",
