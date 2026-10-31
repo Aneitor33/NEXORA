@@ -28,6 +28,8 @@ const NXPlayer = {
     .nxp__chk{display:flex;gap:6px;align-items:center;font-size:12px;color:#c9c9d4;font-weight:600}
     .nxp--cine{background:#000}
     .nxp--cine .nxp__stage{box-shadow:0 0 140px rgba(242,13,53,.14);border:1px solid rgba(255,255,255,.07)}
+    .nxp__status{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;gap:10px;
+      flex-wrap:wrap;padding:20px;text-align:center;background:rgba(0,0,0,.55);color:#8e8e9c;font-size:13.5px}
   `,
   injectStyles() {
     if (document.getElementById('nxp-styles')) return;
@@ -65,7 +67,10 @@ const NXPlayer = {
         <button class="nxp__btn" data-x="cine">Modo cine</button>
         <button class="nxp__btn" data-x="full">Pantalla completa</button>
       </div>
-      <div class="nxp__stage"><iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="no-referrer"></iframe></div>
+      <div class="nxp__stage">
+        <iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="no-referrer"></iframe>
+        <div class="nxp__status" data-x="status"><span data-x="statustxt">Conectando con el servidor…</span><button class="nxp__btn" data-x="retry" hidden>Reintentar</button></div>
+      </div>
       <div class="nxp__dock" data-x="dock"></div>`;
     this.el.addEventListener('click', e => {
       const b = e.target.closest('[data-x]'); if (!b) return;
@@ -75,10 +80,34 @@ const NXPlayer = {
       if (x === 'seen') this.markSeen();
       if (x === 'full') this.el.requestFullscreen?.().catch(() => {});
       if (x === 'cine') this.el.classList.toggle('nxp--cine');
+      if (x === 'retry') this.retryServer();
       if (x === 'autonext') localStorage.setItem('nx.autonext', b.checked ? '1' : '0');
       if (b.dataset.lang) { this.lang = b.dataset.lang; this.renderDock(); }
       if (b.dataset.srv) this.setServer(+b.dataset.srv);
     });
+    // el iframe cross-origin sí dispara 'load' (aunque el contenido esté bloqueado):
+    // al cargar, ocultamos el estado; si tarda >12 s, ofrecemos reintento.
+    $('iframe', this.el).addEventListener('load', () => {
+      clearTimeout(this._to);
+      const st = $('[data-x="status"]', this.el); if (st) st.hidden = true;
+    });
+  },
+  armStatus() {
+    clearTimeout(this._to);
+    const st = $('[data-x="status"]', this.el); if (!st) return;
+    st.hidden = false;
+    $('[data-x="statustxt"]', st).textContent = 'Conectando con el servidor…';
+    $('[data-x="retry"]', st).hidden = true;
+    this._to = setTimeout(() => {
+      if (st.hidden) return;
+      $('[data-x="statustxt"]', st).textContent = 'El servidor tarda en responder (puede estar bloqueado en tu red o caído). Prueba otro servidor de la lista o reintenta:';
+      $('[data-x="retry"]', st).hidden = false;
+    }, 12000);
+  },
+  retryServer() {
+    const st = $('[data-x="status"]', this.el); if (st) st.hidden = true;
+    this.iframe().src = this.srvList[this.srvIdx]?.src || 'about:blank';
+    this.armStatus();
   },
   eps() { return (this.detail.episodes || []).filter(e => (e.servers || []).length).sort((a, b) => (a.number ?? 0) - (b.number ?? 0)); },
   play(ep) {
@@ -89,6 +118,7 @@ const NXPlayer = {
     const list = servers.filter(s => (s.lang || 'sin etiqueta') === this.lang);
     this.srvIdx = 0; this.srvList = list; this.curEp = ep;
     this.iframe().src = list[0]?.src || 'about:blank';
+    this.armStatus();
     $('[data-x="epinfo"]', this.el).textContent = `Episodio ${ep.number ?? '?'}`;
     const eps = this.eps(), i = eps.findIndex(e => (e.number ?? e.id) === this.ep);
     $('[data-x="prev"]', this.el).disabled = i <= 0;
@@ -106,7 +136,7 @@ const NXPlayer = {
       '<span style="width:8px"></span>' +
       list.map((s, i) => `<button class="nxp__pill" data-srv="${i}" aria-pressed="${i === this.srvIdx}" title="${String(s.src).replace(/"/g,'')}">${String(s.name || 'servidor').replace(/[<>&]/g,'') || 'servidor'}</button>`).join('');
   },
-  setServer(i) { this.srvIdx = i; this.iframe().src = this.srvList[i]?.src || 'about:blank'; this.renderDock(); },
+  setServer(i) { this.srvIdx = i; this.iframe().src = this.srvList[i]?.src || 'about:blank'; this.armStatus(); this.renderDock(); },
   iframe() { return $('iframe', this.el); },
   step(d) {
     const eps = this.eps(), i = eps.findIndex(e => (e.number ?? e.id) === this.ep);
