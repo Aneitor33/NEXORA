@@ -437,7 +437,7 @@ const Views = {
     try { rep = await (await fetch('public/data/nx-report.json')).json(); } catch {}
     const srcRows = rep ? Object.entries(rep.sources || {}).map(([tag, s]) =>
       `<tr><td style="padding:6px 10px;border-bottom:1px solid var(--nx-line)">${esc(tag)}</td>
-       <td style="padding:6px 10px;border-bottom:1px solid var(--nx-line)">${esc(s.estado || '—')}</td>
+       <td style="padding:6px 10px;border-bottom:1px solid var(--nx-line)">${esc(s.estado || '—')}${s.reasons?.length ? `<div style="color:var(--nx-text-mute);font-size:11px;margin-top:2px">${esc(s.reasons.join(' · '))}</div>` : ''}</td>
        <td style="padding:6px 10px;border-bottom:1px solid var(--nx-line)">${s.actual ?? '—'}</td></tr>`).join('') : '';
     view.insertAdjacentHTML('beforeend', `<div class="nx-viewhead"><h1>Ajustes</h1><p>Estado del catálogo y preferencias locales.</p></div>
     <div class="nx-detailbody" style="padding-top:0">
