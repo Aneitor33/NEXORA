@@ -87,6 +87,17 @@ const Catalog = {
   },
   async detail(id) {
     if (this.mode === 'canonical') {
+      /* modo cubetas (30k+): un fichero por prefijo de id, cacheado en memoria.
+         modo ficheros (<4000): detalle individual. */
+      if (this.manifest?.detailsMode === 'buckets') {
+        this._buckets ||= new Map();
+        const key = detailName(id).replace(/^nx_(hash|tmdb)_/, '').slice(0, 2) || 'zz';
+        if (!this._buckets.has(key)) {
+          try { this._buckets.set(key, (await (await fetch(`public/data/nx-details-b-${key}.json`)).json()).items); }
+          catch { this._buckets.set(key, {}); }
+        }
+        return this._buckets.get(key)[id] || null;
+      }
       try { return await (await fetch(`public/data/nx-details/${detailName(id)}.json`)).json(); }
       catch { return null; }
     }
@@ -172,6 +183,23 @@ function bindFav(root) {
 }
 
 /* ---------------- vistas ---------------- */
+/* rejilla paginada: nunca más de CAP tarjetas en el DOM (30k títulos sin colgar el TV Box) */
+const GRID_CAP = 240;
+function fillGrid(grid, list, emptyMsg) {
+  const drawN = n => {
+    grid.replaceChildren(...list.slice(0, n).map(i => card(i)));
+    const old = grid.querySelector('[data-more]'); if (old) old.remove();
+    if (!list.length) { grid.innerHTML = `<div class="nx-empty" style="grid-column:1/-1">${emptyMsg}</div>`; return; }
+    if (list.length > n) {
+      const more = document.createElement('button');
+      more.className = 'nx-chip'; more.dataset.more = '1'; more.style.gridColumn = '1/-1';
+      more.textContent = `Cargar más (${list.length - n} restantes)`;
+      more.addEventListener('click', () => drawN(n + GRID_CAP));
+      grid.appendChild(more);
+    }
+  };
+  drawN(Math.min(GRID_CAP, list.length));
+}
 const Views = {
   async home(view) {
     const items = await Catalog.load();
@@ -222,8 +250,7 @@ const Views = {
       if (mode === 'air') l = l.filter(i => i.st === 'airing');
       if (mode === 'fin') l = l.filter(i => i.st === 'finished');
       if (mode === 'az') l.sort((a, b) => a.t.localeCompare(b.t)); else l.sort(byU);
-      grid.replaceChildren(...l.map(i => card(i)));
-      if (!l.length) grid.innerHTML = '<div class="nx-empty" style="grid-column:1/-1">Sin resultados con estos filtros.</div>';
+      fillGrid(grid, l, 'Sin resultados con estos filtros.');
     };
     chips.addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b) return;
@@ -263,8 +290,7 @@ const Views = {
           if (k === 'st' && i.st !== v) return false; }
         return true;
       }).sort(byU);
-      grid.replaceChildren(...l.map(i => card(i)));
-      if (!l.length) grid.innerHTML = '<div class="nx-empty" style="grid-column:1/-1">Sin resultados. Quita algún filtro.</div>';
+      fillGrid(grid, l, 'Sin resultados. Quita algún filtro.');
     };
     chips.addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (!b) return;
       const f = b.dataset.f; active.has(f) ? active.delete(f) : active.add(f);
@@ -325,7 +351,7 @@ const Views = {
     const r = Catalog.search(q);
     view.insertAdjacentHTML('beforeend', `<div class="nx-viewhead"><h1>Resultados para “${esc(q)}”</h1><p>${r.length} coincidencias.</p></div>`);
     const grid = document.createElement('div'); grid.className = 'nx-grid';
-    grid.replaceChildren(...r.map(i => card(i)));
+    fillGrid(grid, r, 'Sin coincidencias.');
     view.appendChild(grid);
   },
 
