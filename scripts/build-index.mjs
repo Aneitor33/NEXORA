@@ -150,7 +150,8 @@ function runGates(tag, data, prev, report) {
   const reasons = [];
   const items = Array.isArray(data.series) ? data.series : [];
   const meta = data.meta || {};
-  if (!meta.catalogTag && !data.lite) reasons.push('meta.catalogTag ausente');
+  // El tag se deriva del nombre de fichero si meta.catalogTag no existe (los scrapers
+  // de DonghuaFlix no lo escriben): catalog-<tag>.json → <tag>. No es motivo de rechazo.
   if (items.length === 0) reasons.push('catálogo sin entradas (series vacío)');
   const declared = meta.items ?? meta.series ?? (data.count || null);
   if (declared && Math.abs(items.length - declared) / declared > 0.05)
@@ -169,8 +170,11 @@ function runGates(tag, data, prev, report) {
     if (gone / prev.ids.length > 0.2)
       reasons.push(`desaparición masiva: ${(gone / prev.ids.length * 100).toFixed(1)}% > 20% (sync incompleto)`);
   }
-  if (!FORCE && prev && meta.syncedAt && prev.syncedAt && meta.syncedAt <= prev.syncedAt)
-    reasons.push(`syncedAt (${meta.syncedAt}) no es posterior al anterior (${prev.syncedAt})`);
+  // CI: varios workflows terminan en build-index; una fuente no tocada en ese run llega
+  // con el MISMO syncedAt. Igual = "sin cambios" (se reimporta idempotente); solo se
+  // rechaza si es estrictamente más antigua (rollback de datos).
+  if (!FORCE && prev && meta.syncedAt && prev.syncedAt && meta.syncedAt < prev.syncedAt)
+    reasons.push(`syncedAt (${meta.syncedAt}) es anterior al registrado (${prev.syncedAt})`);
   return { ok: reasons.length === 0, reasons };
 }
 
@@ -218,9 +222,11 @@ const prevManifest = existsSync(prevManifestFile) ? JSON.parse(readFileSync(prev
 
 /* escaneo dual: public/data/ (donde escriben los scrapers en CI) + import/ (descargas locales).
    Sin duplicados por tag: gana el primero encontrado (public/data tiene prioridad). */
+const isCatalog = f => /^catalog-.*\.json$/i.test(f) && !f.endsWith('-index.json')
+  && !/-(failures|progress|state|backup|raw)/i.test(f); // auxiliares de scrapers, no catálogos
 const files = [
-  ...(existsSync(OUT_DIR) ? readdirSync(OUT_DIR).filter(f => /^catalog-.*\.json$/i.test(f) && !f.endsWith('-index.json')).map(f => join(OUT_DIR, f)) : []),
-  ...readdirSync(IMPORT_DIR).filter(f => /^catalog-.*\.json$/i.test(f) && !f.endsWith('-index.json')).map(f => join(IMPORT_DIR, f)),
+  ...(existsSync(OUT_DIR) ? readdirSync(OUT_DIR).filter(isCatalog).map(f => join(OUT_DIR, f)) : []),
+  ...readdirSync(IMPORT_DIR).filter(isCatalog).map(f => join(IMPORT_DIR, f)),
 ];
 const sources = [], report = { generatedAt: new Date().toISOString(), sources: {}, conteos: {}, rechazados: [] };
 const records = []; // {rec, tag, srcId, raw}
