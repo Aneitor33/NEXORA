@@ -1,0 +1,4 @@
+# Dependencias del scraper Python sync-dramas-yt.py (workflow dramas-yt-sync)
+# Si el workflow falla por un modulo ausente, su error indica cual: anadelo aqui.
+requests>=2.31.0
+beautifulsoup4>=4.12.0

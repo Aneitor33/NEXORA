@@ -1,0 +1,16 @@
+{
+  "name": "nexora",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "description": "NEXORA — Entertainment, without limits. (Los workflows hacen npm install con este manifiesto; la web en sí no necesita dependencias)",
+  "scripts": {
+    "fetch:sources": "node scripts/fetch-sources.mjs",
+    "build:index": "node scripts/build-index.mjs"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "express": "^4.21.2",
+    "node-cron": "^3.0.3"
+  }
+}
