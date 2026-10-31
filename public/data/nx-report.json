@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-31T20:22:17.428Z",
+  "generatedAt": "2026-10-31T21:45:50.729Z",
   "sources": {
     "donghualife": {
       "tag": "donghualife",
@@ -7,7 +7,7 @@
       "lite": false,
       "declared": null,
       "actual": 422,
-      "syncedAt": "2026-10-31T19:24:27.166Z",
+      "syncedAt": "2026-10-31T21:45:50.550Z",
       "estado": "ACEPTADO",
       "generosSinMapear": [],
       "generosSaturadosIgnorados": [
