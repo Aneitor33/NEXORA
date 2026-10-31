@@ -1,0 +1,23 @@
+[
+  {
+    "ids": [
+      "nx:hash:83869b264bb1",
+      "nx:hash:7455cbd64d90"
+    ],
+    "score": 60,
+    "signals": [
+      "título exacto",
+      "tipo igual",
+      "país coincide"
+    ],
+    "veto": null,
+    "t": [
+      "Duelo de titanes",
+      "Duelo de titanes"
+    ],
+    "fuentes": [
+      "testlat",
+      "testlat"
+    ]
+  }
+]

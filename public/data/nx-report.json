@@ -1,0 +1,82 @@
+{
+  "generatedAt": "2026-10-31T03:45:22.817Z",
+  "sources": {
+    "broken": {
+      "tag": "broken",
+      "file": "catalog-broken.json",
+      "lite": false,
+      "declared": 5000,
+      "actual": 0,
+      "syncedAt": "2026-10-31T04:00:00Z",
+      "estado": "RECHAZADO",
+      "reasons": [
+        "catálogo sin entradas (series vacío)",
+        "conteo discrepante: meta declara 5000, hay 0"
+      ]
+    },
+    "donghuasub": {
+      "tag": "donghuasub",
+      "file": "catalog-donghuasub.json",
+      "lite": true,
+      "declared": 60,
+      "actual": 60,
+      "syncedAt": "2026-10-31T00:22:06.473Z",
+      "estado": "ACEPTADO",
+      "generosSinMapear": [],
+      "generosSaturadosIgnorados": [],
+      "servidores": {
+        "serversEmpty": 0,
+        "variantA": 0,
+        "variantB": 0
+      },
+      "conGeneresPct": 0
+    },
+    "testlat": {
+      "tag": "testlat",
+      "file": "catalog-testlat.json",
+      "lite": false,
+      "declared": 5,
+      "actual": 5,
+      "syncedAt": "2026-10-31T04:00:00Z",
+      "estado": "ACEPTADO",
+      "generosSinMapear": [],
+      "generosSaturadosIgnorados": [],
+      "servidores": {
+        "serversEmpty": 1,
+        "variantA": 1,
+        "variantB": 1
+      },
+      "conGeneresPct": 80
+    }
+  },
+  "conteos": {
+    "records_originales": 64,
+    "aceptados_por_fuente": {
+      "broken": 0,
+      "donghuasub": 60,
+      "testlat": 5
+    },
+    "matches_entre_fuentes": 1,
+    "fusiones_automaticas": 0,
+    "mismos_hash_unificados": 1,
+    "absorbidos_por_fusion": 0,
+    "canonicos_unicos": 63,
+    "pendientes_revision": 1,
+    "rechazados": 1
+  },
+  "rechazados": [
+    {
+      "tag": "broken",
+      "file": "catalog-broken.json",
+      "reasons": [
+        "catálogo sin entradas (series vacío)",
+        "conteo discrepante: meta declara 5000, hay 0"
+      ]
+    }
+  ],
+  "titulosInvalidosOmitidos": 1,
+  "enriquecimiento": {
+    "shape": "object",
+    "entries": 3
+  }
+}
