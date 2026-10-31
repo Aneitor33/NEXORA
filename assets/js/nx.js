@@ -133,12 +133,12 @@ const Lib = {
 };
 
 /* ---------------- UI ---------------- */
-/* lazy-load con reintento: si la imagen falla (red/TMDB), se re-observa y reintenta
-   al volver a entrar en vista (máx. 2 reintentos; luego queda el placeholder). */
+/* Lazy-load robusto: una imagen NUNCA desaparece tras cargar (sin parpadeo).
+   Reintentos por error en segundo plano, con espera creciente, máx. 2. */
 const imgObserver = new IntersectionObserver(es => {
   for (const en of es) {
-    if (!en.isIntersecting) continue;
     const img = en.target;
+    if (!en.isIntersecting || img.dataset.ok) continue;
     imgObserver.unobserve(img);
     const n = +(img.dataset.retries || 0);
     if (n >= 2) continue;
@@ -164,8 +164,12 @@ function card(item, prog) {
   const img = a.querySelector('img');
   if (img) {
     img.decoding = 'async';
-    img.addEventListener('load', () => img.classList.add('nx-loaded'), { once: true });
-    img.addEventListener('error', () => { img.classList.remove('nx-loaded'); imgObserver.observe(img); });
+    img.addEventListener('load', () => { img.dataset.ok = '1'; img.classList.add('nx-loaded'); });
+    img.addEventListener('error', () => {
+      if (img.dataset.ok) return; // jamás ocultar una imagen ya cargada
+      const n = +(img.dataset.retries || 0);
+      if (n < 2) setTimeout(() => { if (!img.dataset.ok && img.isConnected) img.src = img.dataset.src; }, 1200 * (n + 1));
+    });
     imgObserver.observe(img);
   }
   return a;
@@ -508,9 +512,11 @@ async function route() {
   const [path, query] = hash.split('?');
   markCurrent(path);
   const view = $('#view'); view.replaceChildren();
+  view.innerHTML = '<div class="nx-empty">Cargando catálogo…</div>';
   window.scrollTo(0, 0);
   try {
     await Catalog.load();
+    view.replaceChildren();
     const seg = path.split('/').filter(Boolean);
     if (path === '/')                     await Views.home(view);
     else if (path === '/explorar')        await Views.explore(view);
