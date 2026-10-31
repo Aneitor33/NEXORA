@@ -133,7 +133,19 @@ const Lib = {
 };
 
 /* ---------------- UI ---------------- */
-const imgObserver = new IntersectionObserver(es => { for (const en of es) if (en.isIntersecting) { const img = en.target; img.src = img.dataset.src; imgObserver.unobserve(img); } }, { rootMargin: '200px' });
+/* lazy-load con reintento: si la imagen falla (red/TMDB), se re-observa y reintenta
+   al volver a entrar en vista (máx. 2 reintentos; luego queda el placeholder). */
+const imgObserver = new IntersectionObserver(es => {
+  for (const en of es) {
+    if (!en.isIntersecting) continue;
+    const img = en.target;
+    imgObserver.unobserve(img);
+    const n = +(img.dataset.retries || 0);
+    if (n >= 2) continue;
+    img.dataset.retries = n + 1;
+    img.src = img.dataset.src;
+  }
+}, { rootMargin: '300px' });
 const metaLine = it => { const b = []; if (it.y) b.push(String(it.y)); b.push(L_ST[it.st] || 'Sin confirmar'); if (it.e) b.push(it.e + (it.ty === 'movie' ? '' : ' ep.')); return b.join(' · '); };
 
 function card(item, prog) {
@@ -150,7 +162,12 @@ function card(item, prog) {
     </div>
     ${prog != null ? `<div class="nx-card__prog"><i style="width:${prog}%"></i></div>` : ''}`;
   const img = a.querySelector('img');
-  if (img) { img.addEventListener('load', () => img.classList.add('nx-loaded'), { once: true }); imgObserver.observe(img); }
+  if (img) {
+    img.decoding = 'async';
+    img.addEventListener('load', () => img.classList.add('nx-loaded'), { once: true });
+    img.addEventListener('error', () => { img.classList.remove('nx-loaded'); imgObserver.observe(img); });
+    imgObserver.observe(img);
+  }
   return a;
 }
 function row(title, items, { hint = '', more = null, prog = null } = {}) {
