@@ -199,8 +199,8 @@ class UF {
 
 /* ---------------- enriquecimiento de géneros (dfx-genres) ---------------- */
 function loadEnrichment() {
-  const f = join(IMPORT_DIR, 'dfx-genres.json');
-  if (!existsSync(f)) return { map: new Map(), shape: 'ausente' };
+  const f = [join(IMPORT_DIR, 'dfx-genres.json'), join(OUT_DIR, 'dfx-genres.json')].find(existsSync);
+  if (!f) return { map: new Map(), shape: 'ausente' };
   try {
     const d = JSON.parse(readFileSync(f, 'utf8'));
     const map = new Map();
@@ -216,16 +216,25 @@ const state = existsSync(stateFile) ? JSON.parse(readFileSync(stateFile, 'utf8')
 const prevManifestFile = join(OUT_DIR, 'nx-manifest.json');
 const prevManifest = existsSync(prevManifestFile) ? JSON.parse(readFileSync(prevManifestFile, 'utf8')) : null;
 
-const files = readdirSync(IMPORT_DIR).filter(f => /^catalog-.*\.json$/i.test(f) && !f.endsWith('-index.json'));
+/* escaneo dual: public/data/ (donde escriben los scrapers en CI) + import/ (descargas locales).
+   Sin duplicados por tag: gana el primero encontrado (public/data tiene prioridad). */
+const files = [
+  ...(existsSync(OUT_DIR) ? readdirSync(OUT_DIR).filter(f => /^catalog-.*\.json$/i.test(f) && !f.endsWith('-index.json')).map(f => join(OUT_DIR, f)) : []),
+  ...readdirSync(IMPORT_DIR).filter(f => /^catalog-.*\.json$/i.test(f) && !f.endsWith('-index.json')).map(f => join(IMPORT_DIR, f)),
+];
 const sources = [], report = { generatedAt: new Date().toISOString(), sources: {}, conteos: {}, rechazados: [] };
 const records = []; // {rec, tag, srcId, raw}
 
-for (const file of files) {
-  const path = join(IMPORT_DIR, file);
+const seenTags = new Set();
+for (const path of files) {
+  const file = basename(path);
   let data; try { data = JSON.parse(readFileSync(path, 'utf8')); }
   catch (e) { report.rechazados.push({ file, reasons: ['JSON ilegible: ' + e.message] }); continue; }
+  if (data._note && /FIXTURE/i.test(data._note)) { report.sources[basename(file, '.json')] = { file, estado: 'OMITIDO (fixture de prueba)' }; continue; }
   const lite = !!(data.lite || data.compact);
   const tag = data.meta?.catalogTag || basename(file, '.json').replace(/^catalog-/, '');
+  if (seenTags.has(tag)) { report.sources[tag + ' (duplicado)'] = { file, estado: 'OMITIDO (tag ya procesado desde otra ruta)' }; continue; }
+  seenTags.add(tag);
   const prev = state.sources[tag] || null;
   const gates = runGates(tag, data, prev, report);
   const entry = { tag, file, lite, declared: data.meta?.items ?? data.count ?? null, actual: Array.isArray(data.series) ? data.series.length : 0, syncedAt: data.meta?.syncedAt || null };
