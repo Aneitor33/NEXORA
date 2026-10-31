@@ -26,6 +26,8 @@ const NXPlayer = {
     .nxp__pill{padding:6px 11px;border-radius:8px;border:1px solid rgba(255,255,255,.14);font-size:12px;font-weight:600}
     .nxp__pill[aria-pressed="true"]{border-color:#f20d35;box-shadow:0 0 0 2px rgba(242,13,53,.35)}
     .nxp__chk{display:flex;gap:6px;align-items:center;font-size:12px;color:#c9c9d4;font-weight:600}
+    .nxp--cine{background:#000}
+    .nxp--cine .nxp__stage{box-shadow:0 0 140px rgba(242,13,53,.14);border:1px solid rgba(255,255,255,.07)}
   `,
   injectStyles() {
     if (document.getElementById('nxp-styles')) return;
@@ -60,6 +62,7 @@ const NXPlayer = {
         <button class="nxp__btn" data-x="next">Siguiente ›</button>
         <button class="nxp__btn" data-x="seen">Marcar visto ✓</button>
         <label class="nxp__chk"><input type="checkbox" data-x="autonext" ${localStorage.getItem('nx.autonext') === '1' ? 'checked' : ''}> autoplay</label>
+        <button class="nxp__btn" data-x="cine">Modo cine</button>
         <button class="nxp__btn" data-x="full">Pantalla completa</button>
       </div>
       <div class="nxp__stage"><iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="no-referrer"></iframe></div>
@@ -71,6 +74,7 @@ const NXPlayer = {
       if (x === 'prev' || x === 'next') this.step(x === 'next' ? 1 : -1);
       if (x === 'seen') this.markSeen();
       if (x === 'full') this.el.requestFullscreen?.().catch(() => {});
+      if (x === 'cine') this.el.classList.toggle('nxp--cine');
       if (x === 'autonext') localStorage.setItem('nx.autonext', b.checked ? '1' : '0');
       if (b.dataset.lang) { this.lang = b.dataset.lang; this.renderDock(); }
       if (b.dataset.srv) this.setServer(+b.dataset.srv);

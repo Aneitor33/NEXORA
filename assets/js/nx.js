@@ -33,6 +33,7 @@ const ICONS = {
   ai: I('<path d="M12 3l1.7 4.6L18 9.3l-4.3 1.7L12 15.6l-1.7-4.6L6 9.3l4.3-1.7z"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>'),
   settings: I('<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2-1.2L14.2 3h-4l-.4 2.7a7 7 0 0 0-2 1.2l-2.3-1-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2 1.2l.4 2.7h4l.4-2.7a7 7 0 0 0 2-1.2l2.3 1 2-3.4-2-1.5c.07-.4.1-.8.1-1.2z"/>'),
   heart: I('<path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/>'),
+  clock: I('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
   heartFill: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg>',
 };
 
@@ -40,6 +41,8 @@ const ICONS = {
 const SECTIONS = [
   { path: '/',           label: 'Inicio',       icon: 'home',     view: 'home' },
   { path: '/explorar',   label: 'Explorar',     icon: 'compass',  view: 'explore' },
+  { path: '/generos',    label: 'Géneros',      icon: 'spark',    view: 'genres' },
+  { path: '/novedades',  label: 'Novedades',    icon: 'clock',    view: 'news' },
   { path: '/peliculas',  label: 'Películas',    icon: 'film',     view: 'cat', cat: 'movie' },
   { path: '/series',     label: 'Series',       icon: 'tv',       view: 'cat', ty: 'series' },
   { path: '/anime',      label: 'Anime',        icon: 'spark',    view: 'cat', cat: 'anime' },
@@ -53,7 +56,7 @@ const SECTIONS = [
 function renderNav() {
   $('#topNav').innerHTML = SECTIONS.slice(0, 8).map(s => `<a href="#${s.path}" data-path="${s.path}">${s.label}</a>`).join('');
   $('#sidebar').innerHTML = SECTIONS.map(s => `<a class="nx-sideitem ${s.sideEnd ? 'nx-sideitem--end' : ''}" href="#${s.path}" data-path="${s.path}">${ICONS[s.icon]}<span>${s.label.split(' ')[0]}</span></a>`).join('');
-  $('#bottomNav').innerHTML = [SECTIONS[0], SECTIONS[1], SECTIONS[4], SECTIONS[7], SECTIONS[9]].map(s => `<a href="#${s.path}" data-path="${s.path}">${ICONS[s.icon]}<span>${s.label.split(' ')[0]}</span></a>`).join('');
+  $('#bottomNav').innerHTML = [SECTIONS[0], SECTIONS[1], SECTIONS[2], SECTIONS[9], SECTIONS[11]].map(s => `<a href="#${s.path}" data-path="${s.path}">${ICONS[s.icon]}<span>${s.label.split(' ')[0]}</span></a>`).join('');
 }
 const markCurrent = path => $$('[data-path]').forEach(a => a.getAttribute('data-path') === path ? a.setAttribute('aria-current','page') : a.removeAttribute('aria-current'));
 
@@ -87,6 +90,17 @@ const Catalog = {
   },
   async detail(id) {
     if (this.mode === 'canonical') {
+      /* modo cubetas (30k+): un fichero por prefijo de id, cacheado en memoria.
+         modo ficheros (<4000): detalle individual. */
+      if (this.manifest?.detailsMode === 'buckets') {
+        this._buckets ||= new Map();
+        const key = detailName(id).replace(/^nx_(hash|tmdb)_/, '').slice(0, 2) || 'zz';
+        if (!this._buckets.has(key)) {
+          try { this._buckets.set(key, (await (await fetch(`public/data/nx-details-b-${key}.json`)).json()).items); }
+          catch { this._buckets.set(key, {}); }
+        }
+        return this._buckets.get(key)[id] || null;
+      }
       try { return await (await fetch(`public/data/nx-details/${detailName(id)}.json`)).json(); }
       catch { return null; }
     }
@@ -103,7 +117,7 @@ const Catalog = {
 const Lib = {
   key: 'nx.lib.v1',
   read()  { try { return JSON.parse(localStorage.getItem(this.key)) || { favs: {}, progress: {}, history: {} }; } catch { return { favs: {}, progress: {}, history: {} }; } },
-  write(d){ localStorage.setItem(this.key, JSON.stringify(d)); },
+  write(d){ localStorage.setItem(this.key, JSON.stringify(d)); if (window.NXSync) NXSync.push(); },
   toggleFav(id) { const d = this.read(); d.favs[id] ? delete d.favs[id] : d.favs[id] = Date.now(); this.write(d); return !!d.favs[id]; },
   isFav(id)     { return !!this.read().favs[id]; },
   favs()        { const d = this.read(); return Catalog.items.filter(i => d.favs[i.id]); },
@@ -172,6 +186,23 @@ function bindFav(root) {
 }
 
 /* ---------------- vistas ---------------- */
+/* rejilla paginada: nunca más de CAP tarjetas en el DOM (30k títulos sin colgar el TV Box) */
+const GRID_CAP = 240;
+function fillGrid(grid, list, emptyMsg) {
+  const drawN = n => {
+    grid.replaceChildren(...list.slice(0, n).map(i => card(i)));
+    const old = grid.querySelector('[data-more]'); if (old) old.remove();
+    if (!list.length) { grid.innerHTML = `<div class="nx-empty" style="grid-column:1/-1">${emptyMsg}</div>`; return; }
+    if (list.length > n) {
+      const more = document.createElement('button');
+      more.className = 'nx-chip'; more.dataset.more = '1'; more.style.gridColumn = '1/-1';
+      more.textContent = `Cargar más (${list.length - n} restantes)`;
+      more.addEventListener('click', () => drawN(n + GRID_CAP));
+      grid.appendChild(more);
+    }
+  };
+  drawN(Math.min(GRID_CAP, list.length));
+}
 const Views = {
   async home(view) {
     const items = await Catalog.load();
@@ -222,8 +253,7 @@ const Views = {
       if (mode === 'air') l = l.filter(i => i.st === 'airing');
       if (mode === 'fin') l = l.filter(i => i.st === 'finished');
       if (mode === 'az') l.sort((a, b) => a.t.localeCompare(b.t)); else l.sort(byU);
-      grid.replaceChildren(...l.map(i => card(i)));
-      if (!l.length) grid.innerHTML = '<div class="nx-empty" style="grid-column:1/-1">Sin resultados con estos filtros.</div>';
+      fillGrid(grid, l, 'Sin resultados con estos filtros.');
     };
     chips.addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b) return;
@@ -263,8 +293,7 @@ const Views = {
           if (k === 'st' && i.st !== v) return false; }
         return true;
       }).sort(byU);
-      grid.replaceChildren(...l.map(i => card(i)));
-      if (!l.length) grid.innerHTML = '<div class="nx-empty" style="grid-column:1/-1">Sin resultados. Quita algún filtro.</div>';
+      fillGrid(grid, l, 'Sin resultados. Quita algún filtro.');
     };
     chips.addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (!b) return;
       const f = b.dataset.f; active.has(f) ? active.delete(f) : active.add(f);
@@ -325,7 +354,7 @@ const Views = {
     const r = Catalog.search(q);
     view.insertAdjacentHTML('beforeend', `<div class="nx-viewhead"><h1>Resultados para “${esc(q)}”</h1><p>${r.length} coincidencias.</p></div>`);
     const grid = document.createElement('div'); grid.className = 'nx-grid';
-    grid.replaceChildren(...r.map(i => card(i)));
+    fillGrid(grid, r, 'Sin coincidencias.');
     view.appendChild(grid);
   },
 
@@ -363,10 +392,91 @@ const Views = {
         const res = $('#ia-results'); res.replaceChildren();
         if (d.picks?.length) {
           res.appendChild(row('Recomendado para ti', d.picks.map(p => Catalog.items.find(i => i.id === p.id)).filter(Boolean)));
-          d.picks.forEach(p => { const it = Catalog.items.find(i => i.id === p.id);
-            if (it) res.querySelectorAll('.nx-card__title').forEach(() => {}); });
         }
       } catch { box.lastElementChild.remove(); addMsg('No se pudo contactar con el asistente (¿está en Cloudflare Pages con functions?).', false); }
+    });
+  },
+
+  async genres(view) {
+    const items = await Catalog.load();
+    const counts = Catalog.genresOf(items);
+    view.insertAdjacentHTML('beforeend', `<div class="nx-viewhead"><h1>Géneros</h1><p>${counts.length} géneros con contenido. Toca uno para explorarlo.</p></div>
+      <div class="nx-filters">${counts.map(([g, n]) => `<a class="nx-chip" href="#/genero/${encodeURIComponent(g)}">${esc(L_GEN[g] || g)} · ${n}</a>`).join('')}</div>
+      ${counts.length ? '' : '<div class="nx-empty">Los géneros aparecen cuando el enriquecimiento (dfx-genres/TMDB) los confirma.</div>'}`);
+  },
+
+  async genre(view, { g }) {
+    const items = await Catalog.load();
+    const list = items.filter(i => (i.g || []).includes(g)).sort(byU);
+    view.insertAdjacentHTML('beforeend', `<div class="nx-viewhead"><h1>${esc(L_GEN[g] || g)}</h1><p>${list.length} títulos</p></div>`);
+    const grid = document.createElement('div'); grid.className = 'nx-grid';
+    fillGrid(grid, list, 'Sin títulos en este género todavía.');
+    view.appendChild(grid);
+  },
+
+  async news(view) {
+    const items = await Catalog.load();
+    const now = Date.now(), d7 = now - 7 * 864e5, d30 = now - 30 * 864e5;
+    const byU = list => [...list].sort((a, b) => new Date(b.u || 0) - new Date(a.u || 0));
+    view.insertAdjacentHTML('beforeend', `<div class="nx-viewhead"><h1>Novedades</h1><p>Cronología por fechas verificadas: incorporación/actualización (no confundir con estreno).</p></div>`);
+    const rows = document.createElement('div'); rows.className = 'nx-rows';
+    const w7 = byU(items.filter(i => new Date(i.u || 0).getTime() >= d7));
+    const w30 = byU(items.filter(i => { const t = new Date(i.u || 0).getTime(); return t >= d30 && t < d7; }));
+    if (w7.length) rows.appendChild(row('Actualizados esta semana', w7.slice(0, 24)));
+    if (w30.length) rows.appendChild(row('Últimos 30 días', w30.slice(0, 24)));
+    for (const y of [2026, 2025, 2024]) {
+      const l = items.filter(i => i.y === y).sort((a, b) => byU([a, b])[0] === a ? -1 : 1).slice(0, 18);
+      if (l.length) rows.appendChild(row(`Estrenos ${y}`, l, { hint: 'por año de estreno' }));
+    }
+    view.appendChild(rows);
+  },
+
+  async settings(view) {
+    const c = Catalog.counts();
+    let rep = null;
+    try { rep = await (await fetch('public/data/nx-report.json')).json(); } catch {}
+    const srcRows = rep ? Object.entries(rep.sources || {}).map(([tag, s]) =>
+      `<tr><td style="padding:6px 10px;border-bottom:1px solid var(--nx-line)">${esc(tag)}</td>
+       <td style="padding:6px 10px;border-bottom:1px solid var(--nx-line)">${esc(s.estado || '—')}</td>
+       <td style="padding:6px 10px;border-bottom:1px solid var(--nx-line)">${s.actual ?? '—'}</td></tr>`).join('') : '';
+    view.insertAdjacentHTML('beforeend', `<div class="nx-viewhead"><h1>Ajustes</h1><p>Estado del catálogo y preferencias locales.</p></div>
+    <div class="nx-detailbody" style="padding-top:0">
+      <h2 class="nx-row__title" style="margin:0 0 10px">Catálogo</h2>
+      <dl class="nx-kv">
+        <div><dt>Modo</dt><dd>${Catalog.mode === 'canonical' ? 'Canónico (nx-*)' : 'Demo'}</dd></div>
+        <div><dt>Títulos únicos</dt><dd>${c ? c.canonicos_unicos : Catalog.items.length}</dd></div>
+        <div><dt>Registros de fuente</dt><dd>${c ? c.records_originales : '—'}</dd></div>
+        <div><dt>Pendientes de revisión</dt><dd>${c ? c.pendientes_revision : '—'}</dd></div>
+        <div><dt>Importado</dt><dd>${rep ? fmtDate(rep.generatedAt) : '—'}</dd></div>
+      </dl>
+      ${srcRows ? `<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:24px">${srcRows}</table>` : ''}
+      <h2 class="nx-row__title" style="margin:0 0 10px">Reproducción</h2>
+      <div class="nx-filters" style="padding:0 0 20px">
+        <button class="nx-chip" id="setAutonext" aria-pressed="${localStorage.getItem('nx.autonext') === '1'}">Autoplay siguiente episodio</button>
+      </div>
+      <h2 class="nx-row__title" style="margin:0 0 10px">Aplicación</h2>
+      <div class="nx-filters" style="padding:0">
+        <button class="nx-chip" id="setInstall">Instalar app (PWA)</button>
+        <button class="nx-chip" id="setClear">Borrar datos locales (favoritos, progreso, historial)</button>
+      </div>
+      <p class="nx-empty" style="text-align:left;padding:18px 0">La sincronización entre dispositivos (cuenta) se activará cuando conectemos el backend; los datos actuales viven solo en este dispositivo.</p>
+    </div>`);
+    $('#setAutonext', view).addEventListener('click', e => {
+      const on = localStorage.getItem('nx.autonext') === '1';
+      localStorage.setItem('nx.autonext', on ? '0' : '1');
+      e.currentTarget.setAttribute('aria-pressed', String(!on));
+      toast(!on ? 'Autoplay activado' : 'Autoplay desactivado');
+    });
+    $('#setClear', view).addEventListener('click', () => {
+      if (confirm('¿Borrar favoritos, progreso e historial de este dispositivo?')) {
+        localStorage.removeItem(Lib.key); toast('Datos locales borrados'); route();
+      }
+    });
+    let deferred = null;
+    window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; }, { once: true });
+    $('#setInstall', view).addEventListener('click', async () => {
+      if (deferred) { deferred.prompt(); await deferred.userChoice; deferred = null; }
+      else toast('Si la app es instalable, usa el menú del navegador → "Añadir a pantalla de inicio".');
     });
   },
 
@@ -387,9 +497,12 @@ async function route() {
     const seg = path.split('/').filter(Boolean);
     if (path === '/')                     await Views.home(view);
     else if (path === '/explorar')        await Views.explore(view);
+    else if (path === '/generos')         await Views.genres(view);
+    else if (path === '/novedades')       await Views.news(view);
+    else if (seg[0] === 'genero')         await Views.genre(view, { g: decodeURIComponent(seg[1] || '') });
     else if (path === '/biblioteca')      await Views.library(view);
     else if (path === '/ia')              await Views.ia(view);
-    else if (path === '/ajustes')         await Views.placeholder(view, 'Ajustes', 'Tema, autoplay y sincronización entre dispositivos: siguiente iteración.');
+    else if (path === '/ajustes')         await Views.settings(view);
     else if (seg[0] === 'titulo')         await Views.title(view, { id: decodeURIComponent(seg[1] || '') });
     else if (seg[0] === 'buscar')         await Views.search(view, { q: new URLSearchParams(query).get('q') || '' });
     else {
@@ -437,3 +550,5 @@ $('#searchForm').addEventListener('submit', e => {
 });
 window.addEventListener('hashchange', route);
 route();
+/* sync entre dispositivos: si NX_SYNC_CONFIG está definido (nx-sync.js), traer cambios */
+if (window.NXSync) NXSync.pull().then(changed => { if (changed) route(); });

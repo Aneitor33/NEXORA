@@ -15,7 +15,7 @@ const arg = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] :
 const IMPORT_DIR = arg('--import-dir', 'import');
 const OUT_DIR = arg('--out', 'public/data');
 const FORCE = args.includes('--force'); // re-importar los mismos syncs (mantenimiento); no saltar las puertas de integridad 1/3/4/5
-const SHARD_SIZE = 500;
+const SHARD_SIZE = 1500; // shards de índice mayores: menos peticiones al arrancar (30k ⇒ ~20 shards)
 
 /* ---------------- configuración de normalización ---------------- */
 const GENRE_MAP = {
@@ -268,6 +268,11 @@ for (const { tag, data, lite } of sources) {
   const sat = stats_genreSat.get(tag);
   const episodes = lite ? [] : (data.episodes || []);
   const seasons = lite ? [] : (data.seasons || []);
+  /* índices por seriesId: O(1) por serie. El filter() anterior era O(series × episodes):
+     con 20k series y 300k episodios se colgaba horas. */
+  const epMap = new Map(), seaMap = new Map();
+  for (const ep of episodes) { const k = String(ep.seriesId); if (!epMap.has(k)) epMap.set(k, []); epMap.get(k).push(ep); }
+  for (const s of seasons)   { const k = String(s.seriesId); if (!seaMap.has(k)) seaMap.set(k, []); seaMap.get(k).push(s); }
   const stats = { serversEmpty: 0, variantA: 0, variantB: 0 };
   for (const e of data.series || []) {
     const title = e.title ?? e.t ?? '';
@@ -292,8 +297,8 @@ for (const { tag, data, lite } of sources) {
     else if (p && /^\//.test(p)) p = null; // ruta relativa no resoluble (H6): null + contabilizar
     const epCount = e.totalEpisodes ?? e.e ?? null;
     const { id } = canonicalId({ title, tmdbId: e.tmdbId ?? e.tmdb_id, ids: e.ids }, ty, y, country.v);
-    const eps = episodes.filter(ep => String(ep.seriesId) === srcId).sort((a, b) => (a.number ?? 0) - (b.number ?? 0));
-    const seas = seasons.filter(s => String(s.seriesId) === srcId).sort((a, b) => (a.number ?? 0) - (b.number ?? 0));
+    const eps = (epMap.get(srcId) || []).slice().sort((a, b) => (a.number ?? 0) - (b.number ?? 0));
+    const seas = (seaMap.get(srcId) || []).slice().sort((a, b) => (a.number ?? 0) - (b.number ?? 0));
     records.push({
       rec: {
         id, t: title, alt: [], ty, md, cat, g: finalG, pub: 'unconfirmed',
@@ -399,22 +404,41 @@ if (prevManifest?.canonicalIds) {
 
 /* ---------------- salidas ---------------- */
 mkdirSync(OUT_DIR, { recursive: true });
-mkdirSync(join(OUT_DIR, 'nx-details'), { recursive: true });
 canonical.sort((a, b) => a.id.localeCompare(b.id));
+/* Detalles: ficheros sueltos (<4000 títulos) o cubetas por prefijo (escala 30k+).
+   El límite de 20 000 archivos de Cloudflare Pages lo prohibiría uno-a-uno.
+   Clave determinista: 2 primeros caracteres de id.replace(/[:|]/g,'_') → ~256 cubetas. */
+const dName = c => c.id.replace(/[:|]/g, '_');
+const USE_BUCKETS = canonical.length > 4000;
+const detailPayload = c => {
+  const d = { ...c }; delete d._members;
+  if (c._members) {
+    const eps = c._members.flatMap(m => m.episodes), seas = c._members.flatMap(m => m.seasons);
+    if (eps.length || seas.length) { d.seasons = seas; d.episodes = eps; }
+  }
+  delete d._tombstone;
+  return d;
+};
 const shardCount = Math.max(1, Math.ceil(canonical.length / SHARD_SIZE));
 for (let s = 0; s < shardCount; s++) {
   const part = canonical.slice(s * SHARD_SIZE, (s + 1) * SHARD_SIZE)
     .map(c => ({ id: c.id, t: c.t, ty: c.ty, md: c.md, cat: c.cat, g: c.g, c: c.c, y: c.y, st: c.st, e: c.e, p: c.p, u: c.dates.updated, src: c.src.length }));
   writeFileSync(join(OUT_DIR, `nx-index-${String(s).padStart(2, '0')}.json`), JSON.stringify({ meta: { shard: s, of: shardCount, generatedAt: report.generatedAt }, items: part }));
 }
-for (const c of canonical) {
-  const detail = { ...c }; delete detail._members;
-  if (c._members) {
-    const eps = c._members.flatMap(m => m.episodes); const seas = c._members.flatMap(m => m.seasons);
-    if (eps.length || seas.length) { detail.seasons = seas; detail.episodes = eps; }
+if (USE_BUCKETS) {
+  const buckets = new Map();
+  for (const c of canonical) {
+    const key = dName(c).replace(/^nx_(hash|tmdb)_/, '').slice(0, 2) || 'zz';
+    if (!buckets.has(key)) buckets.set(key, {});
+    buckets.get(key)[c.id] = detailPayload(c);
   }
-  delete detail._tombstone;
-  writeFileSync(join(OUT_DIR, 'nx-details', `${c.id.replace(/[:|]/g, '_')}.json`), JSON.stringify(detail));
+  for (const [key, items] of [...buckets.entries()].sort((a, b) => a[0].localeCompare(b[0])))
+    writeFileSync(join(OUT_DIR, `nx-details-b-${key}.json`), JSON.stringify({ meta: { bucket: key, of: buckets.size, generatedAt: report.generatedAt }, items }));
+  console.log(`Detalles en modo cubetas: ${buckets.size} ficheros (media ${(canonical.length / buckets.size).toFixed(0)} títulos/cubeta)`);
+} else {
+  mkdirSync(join(OUT_DIR, 'nx-details'), { recursive: true });
+  for (const c of canonical)
+    writeFileSync(join(OUT_DIR, 'nx-details', `${dName(c)}.json`), JSON.stringify(detailPayload(c)));
 }
 writeFileSync(join(OUT_DIR, 'nx-sources.json'), JSON.stringify(canonical.map(c => ({ id: c.id, src: c.src }))));
 writeFileSync(join(OUT_DIR, 'nx-review.json'), JSON.stringify(review, null, 2));
@@ -422,6 +446,7 @@ writeFileSync(join(OUT_DIR, 'nx-aliases.json'), JSON.stringify(aliases, null, 2)
 const manifest = {
   generatedAt: report.generatedAt,
   sources: sources.map(s => s.tag),
+  detailsMode: USE_BUCKETS ? 'buckets' : 'files',
   conteos: {
     records_originales: records.length, // todos los registros aceptados (antes de dedup)
     aceptados_por_fuente: Object.fromEntries(Object.entries(report.sources).map(([k, v]) => [k, v.actual])),
