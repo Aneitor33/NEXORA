@@ -1,0 +1,5 @@
+{
+  "_note": "FIXTURE DE PRUEBA con el shape real esperado (mapa título→géneros). En producción: fichero real de 613 KB generado por enrich-genres.",
+  "Guerra de dragones": ["Fantasía", "Wuxia"],
+  "Obra sin géneros": ["Aventura", "Misterio"]
+}
