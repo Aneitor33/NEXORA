@@ -95,6 +95,15 @@ export async function onRequestPost({ request, env, waitUntil }) {
   const origin = new URL(request.url).origin;
   let cat; try { cat = await catalog(origin); } catch { return json({ error: 'Catálogo no disponible todavía (ejecuta build-index).' }, 503); }
   const brief = cat.map(i => ({ id: i.id, t: i.t, ty: i.ty, cat: i.cat, g: i.g, y: i.y }));
+  /* Pre-filtro local por relevancia (catálogos de 30k+): prompt pequeño, respuestas mejores. */
+  const strip = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const tokens = strip(query).split(/[^a-z0-9ñ]+/).filter(w => w.length > 2);
+  const cand = tokens.length
+    ? brief.map(i => { const hay = strip(i.t + ' ' + (i.g || []).join(' ') + ' ' + (i.cat || ''));
+        let s = 0; for (const t of tokens) if (hay.includes(t)) s++;
+        return { i, s }; })
+        .filter(x => x.s > 0).sort((a, b) => b.s - a.s).slice(0, 600).map(x => x.i)
+    : brief.slice(0, 600);
 
   const providers = [
     process.env.GEMINI_API_KEY ? (q, c) => askGemini(q, c) : null,
@@ -105,7 +114,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
 
   for (const call of providers) {
     try {
-      const { text, provider } = await call(query, brief);
+      const { text, provider } = await call(query, cand);
       const parsed = parsePicks(text, cat);
       return json({ ...parsed, provider, catalogSize: cat.length });
     } catch (e) { /* siguiente proveedor */ }
