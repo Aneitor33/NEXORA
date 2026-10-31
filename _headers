@@ -1,0 +1,10 @@
+# NEXORA — cabeceras Cloudflare Pages (caché)
+# Datos del catálogo: frescos (5 min) — la web siempre ve el último sync
+/public/data/*
+  Cache-Control: public, max-age=300, must-revalidate
+# Assets de la app: un día (se invalidan al redeploy)
+/assets/*
+  Cache-Control: public, max-age=86400
+# HTML: siempre revalidar
+/*
+  Cache-Control: no-cache
