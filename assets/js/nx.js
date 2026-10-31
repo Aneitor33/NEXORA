@@ -33,6 +33,7 @@ const ICONS = {
   ai: I('<path d="M12 3l1.7 4.6L18 9.3l-4.3 1.7L12 15.6l-1.7-4.6L6 9.3l4.3-1.7z"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>'),
   settings: I('<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2-1.2L14.2 3h-4l-.4 2.7a7 7 0 0 0-2 1.2l-2.3-1-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2 1.2l.4 2.7h4l.4-2.7a7 7 0 0 0 2-1.2l2.3 1 2-3.4-2-1.5c.07-.4.1-.8.1-1.2z"/>'),
   heart: I('<path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/>'),
+  clock: I('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
   heartFill: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg>',
 };
 
@@ -40,6 +41,8 @@ const ICONS = {
 const SECTIONS = [
   { path: '/',           label: 'Inicio',       icon: 'home',     view: 'home' },
   { path: '/explorar',   label: 'Explorar',     icon: 'compass',  view: 'explore' },
+  { path: '/generos',    label: 'Géneros',      icon: 'spark',    view: 'genres' },
+  { path: '/novedades',  label: 'Novedades',    icon: 'clock',    view: 'news' },
   { path: '/peliculas',  label: 'Películas',    icon: 'film',     view: 'cat', cat: 'movie' },
   { path: '/series',     label: 'Series',       icon: 'tv',       view: 'cat', ty: 'series' },
   { path: '/anime',      label: 'Anime',        icon: 'spark',    view: 'cat', cat: 'anime' },
@@ -53,7 +56,7 @@ const SECTIONS = [
 function renderNav() {
   $('#topNav').innerHTML = SECTIONS.slice(0, 8).map(s => `<a href="#${s.path}" data-path="${s.path}">${s.label}</a>`).join('');
   $('#sidebar').innerHTML = SECTIONS.map(s => `<a class="nx-sideitem ${s.sideEnd ? 'nx-sideitem--end' : ''}" href="#${s.path}" data-path="${s.path}">${ICONS[s.icon]}<span>${s.label.split(' ')[0]}</span></a>`).join('');
-  $('#bottomNav').innerHTML = [SECTIONS[0], SECTIONS[1], SECTIONS[4], SECTIONS[7], SECTIONS[9]].map(s => `<a href="#${s.path}" data-path="${s.path}">${ICONS[s.icon]}<span>${s.label.split(' ')[0]}</span></a>`).join('');
+  $('#bottomNav').innerHTML = [SECTIONS[0], SECTIONS[1], SECTIONS[2], SECTIONS[9], SECTIONS[11]].map(s => `<a href="#${s.path}" data-path="${s.path}">${ICONS[s.icon]}<span>${s.label.split(' ')[0]}</span></a>`).join('');
 }
 const markCurrent = path => $$('[data-path]').forEach(a => a.getAttribute('data-path') === path ? a.setAttribute('aria-current','page') : a.removeAttribute('aria-current'));
 
@@ -114,7 +117,7 @@ const Catalog = {
 const Lib = {
   key: 'nx.lib.v1',
   read()  { try { return JSON.parse(localStorage.getItem(this.key)) || { favs: {}, progress: {}, history: {} }; } catch { return { favs: {}, progress: {}, history: {} }; } },
-  write(d){ localStorage.setItem(this.key, JSON.stringify(d)); },
+  write(d){ localStorage.setItem(this.key, JSON.stringify(d)); if (window.NXSync) NXSync.push(); },
   toggleFav(id) { const d = this.read(); d.favs[id] ? delete d.favs[id] : d.favs[id] = Date.now(); this.write(d); return !!d.favs[id]; },
   isFav(id)     { return !!this.read().favs[id]; },
   favs()        { const d = this.read(); return Catalog.items.filter(i => d.favs[i.id]); },
@@ -394,6 +397,40 @@ const Views = {
     });
   },
 
+  async genres(view) {
+    const items = await Catalog.load();
+    const counts = Catalog.genresOf(items);
+    view.insertAdjacentHTML('beforeend', `<div class="nx-viewhead"><h1>Géneros</h1><p>${counts.length} géneros con contenido. Toca uno para explorarlo.</p></div>
+      <div class="nx-filters">${counts.map(([g, n]) => `<a class="nx-chip" href="#/genero/${encodeURIComponent(g)}">${esc(L_GEN[g] || g)} · ${n}</a>`).join('')}</div>
+      ${counts.length ? '' : '<div class="nx-empty">Los géneros aparecen cuando el enriquecimiento (dfx-genres/TMDB) los confirma.</div>'}`);
+  },
+
+  async genre(view, { g }) {
+    const items = await Catalog.load();
+    const list = items.filter(i => (i.g || []).includes(g)).sort(byU);
+    view.insertAdjacentHTML('beforeend', `<div class="nx-viewhead"><h1>${esc(L_GEN[g] || g)}</h1><p>${list.length} títulos</p></div>`);
+    const grid = document.createElement('div'); grid.className = 'nx-grid';
+    fillGrid(grid, list, 'Sin títulos en este género todavía.');
+    view.appendChild(grid);
+  },
+
+  async news(view) {
+    const items = await Catalog.load();
+    const now = Date.now(), d7 = now - 7 * 864e5, d30 = now - 30 * 864e5;
+    const byU = list => [...list].sort((a, b) => new Date(b.u || 0) - new Date(a.u || 0));
+    view.insertAdjacentHTML('beforeend', `<div class="nx-viewhead"><h1>Novedades</h1><p>Cronología por fechas verificadas: incorporación/actualización (no confundir con estreno).</p></div>`);
+    const rows = document.createElement('div'); rows.className = 'nx-rows';
+    const w7 = byU(items.filter(i => new Date(i.u || 0).getTime() >= d7));
+    const w30 = byU(items.filter(i => { const t = new Date(i.u || 0).getTime(); return t >= d30 && t < d7; }));
+    if (w7.length) rows.appendChild(row('Actualizados esta semana', w7.slice(0, 24)));
+    if (w30.length) rows.appendChild(row('Últimos 30 días', w30.slice(0, 24)));
+    for (const y of [2026, 2025, 2024]) {
+      const l = items.filter(i => i.y === y).sort((a, b) => byU([a, b])[0] === a ? -1 : 1).slice(0, 18);
+      if (l.length) rows.appendChild(row(`Estrenos ${y}`, l, { hint: 'por año de estreno' }));
+    }
+    view.appendChild(rows);
+  },
+
   async settings(view) {
     const c = Catalog.counts();
     let rep = null;
@@ -460,6 +497,9 @@ async function route() {
     const seg = path.split('/').filter(Boolean);
     if (path === '/')                     await Views.home(view);
     else if (path === '/explorar')        await Views.explore(view);
+    else if (path === '/generos')         await Views.genres(view);
+    else if (path === '/novedades')       await Views.news(view);
+    else if (seg[0] === 'genero')         await Views.genre(view, { g: decodeURIComponent(seg[1] || '') });
     else if (path === '/biblioteca')      await Views.library(view);
     else if (path === '/ia')              await Views.ia(view);
     else if (path === '/ajustes')         await Views.settings(view);
@@ -510,3 +550,5 @@ $('#searchForm').addEventListener('submit', e => {
 });
 window.addEventListener('hashchange', route);
 route();
+/* sync entre dispositivos: si NX_SYNC_CONFIG está definido (nx-sync.js), traer cambios */
+if (window.NXSync) NXSync.pull().then(changed => { if (changed) route(); });
