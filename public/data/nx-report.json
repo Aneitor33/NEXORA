@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-31T15:13:18.932Z",
+  "generatedAt": "2026-10-31T19:24:27.356Z",
   "sources": {
     "donghualife": {
       "tag": "donghualife",
@@ -7,37 +7,18 @@
       "lite": false,
       "declared": null,
       "actual": 422,
-      "syncedAt": "2026-10-31T15:13:18.741Z",
-      "estado": "RECHAZADO",
-      "reasons": [
-        "meta.catalogTag ausente"
-      ]
-    },
-    "doramas-failures-v2": {
-      "tag": "doramas-failures-v2",
-      "file": "catalog-doramas-failures-v2.json",
-      "lite": false,
-      "declared": null,
-      "actual": 0,
-      "syncedAt": null,
-      "estado": "RECHAZADO",
-      "reasons": [
-        "meta.catalogTag ausente",
-        "catálogo sin entradas (series vacío)"
-      ]
-    },
-    "doramas-progress": {
-      "tag": "doramas-progress",
-      "file": "catalog-doramas-progress.json",
-      "lite": false,
-      "declared": null,
-      "actual": 0,
-      "syncedAt": null,
-      "estado": "RECHAZADO",
-      "reasons": [
-        "meta.catalogTag ausente",
-        "catálogo sin entradas (series vacío)"
-      ]
+      "syncedAt": "2026-10-31T19:24:27.166Z",
+      "estado": "ACEPTADO",
+      "generosSinMapear": [],
+      "generosSaturadosIgnorados": [
+        "#NaN"
+      ],
+      "servidores": {
+        "serversEmpty": 0,
+        "variantA": 0,
+        "variantB": 46627
+      },
+      "conGeneresPct": 96.7
     },
     "doramas": {
       "tag": "doramas",
@@ -46,10 +27,17 @@
       "declared": null,
       "actual": 193,
       "syncedAt": "2026-10-31T13:09:01.496Z",
-      "estado": "RECHAZADO",
-      "reasons": [
-        "meta.catalogTag ausente"
-      ]
+      "estado": "ACEPTADO",
+      "generosSinMapear": [],
+      "generosSaturadosIgnorados": [
+        "#NaN"
+      ],
+      "servidores": {
+        "serversEmpty": 0,
+        "variantA": 0,
+        "variantB": 4928
+      },
+      "conGeneresPct": 100
     },
     "catalog-broken": {
       "file": "catalog-broken.json",
@@ -62,10 +50,15 @@
       "declared": 60,
       "actual": 60,
       "syncedAt": "2026-10-31T00:22:06.473Z",
-      "estado": "RECHAZADO",
-      "reasons": [
-        "syncedAt (2026-10-31T00:22:06.473Z) no es posterior al anterior (2026-10-31T00:22:06.473Z)"
-      ]
+      "estado": "ACEPTADO",
+      "generosSinMapear": [],
+      "generosSaturadosIgnorados": [],
+      "servidores": {
+        "serversEmpty": 0,
+        "variantA": 0,
+        "variantB": 0
+      },
+      "conGeneresPct": 0
     },
     "catalog-testlat": {
       "file": "catalog-testlat.json",
@@ -73,62 +66,22 @@
     }
   },
   "conteos": {
-    "records_originales": 0,
+    "records_originales": 674,
     "aceptados_por_fuente": {
       "donghualife": 422,
-      "doramas-failures-v2": 0,
-      "doramas-progress": 0,
       "doramas": 193,
       "donghuasub": 60
     },
     "matches_entre_fuentes": 0,
     "fusiones_automaticas": 0,
-    "mismos_hash_unificados": 0,
+    "mismos_hash_unificados": 8,
     "absorbidos_por_fusion": 0,
-    "canonicos_unicos": 0,
+    "canonicos_unicos": 666,
     "pendientes_revision": 0,
-    "rechazados": 5
+    "rechazados": 0
   },
-  "rechazados": [
-    {
-      "tag": "donghualife",
-      "file": "catalog-donghualife.json",
-      "reasons": [
-        "meta.catalogTag ausente"
-      ]
-    },
-    {
-      "tag": "doramas-failures-v2",
-      "file": "catalog-doramas-failures-v2.json",
-      "reasons": [
-        "meta.catalogTag ausente",
-        "catálogo sin entradas (series vacío)"
-      ]
-    },
-    {
-      "tag": "doramas-progress",
-      "file": "catalog-doramas-progress.json",
-      "reasons": [
-        "meta.catalogTag ausente",
-        "catálogo sin entradas (series vacío)"
-      ]
-    },
-    {
-      "tag": "doramas",
-      "file": "catalog-doramas.json",
-      "reasons": [
-        "meta.catalogTag ausente"
-      ]
-    },
-    {
-      "tag": "donghuasub",
-      "file": "catalog-donghuasub.json",
-      "reasons": [
-        "syncedAt (2026-10-31T00:22:06.473Z) no es posterior al anterior (2026-10-31T00:22:06.473Z)"
-      ]
-    }
-  ],
-  "titulosInvalidosOmitidos": 0,
+  "rechazados": [],
+  "titulosInvalidosOmitidos": 1,
   "enriquecimiento": {
     "shape": "object",
     "entries": 3
