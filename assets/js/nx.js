@@ -16,7 +16,7 @@ const L_TY  = { movie:'Película', series:'Serie' };
 const L_MD  = { animation:'Animación', live:'Acción real', unconfirmed:'Medio sin confirmar' };
 const L_CAT = { anime:'Anime', donghua:'Donghua', dorama:'Dorama', 'western-animation':'Animación occidental', 'live-series':'Serie de acción real', movie:'Película', other:'Otro', unconfirmed:'Sin clasificar' };
 const L_ST  = { airing:'En emisión', finished:'Finalizado', upcoming:'Próximamente', gone:'Retirado', unconfirmed:'Sin confirmar' };
-const L_GEN = { accion:'Acción', aventura:'Aventura', romance:'Romance', fantasia:'Fantasía', 'ciencia-ficcion':'Ciencia ficción', terror:'Terror', comedia:'Comedia', misterio:'Misterio', drama:'Drama', suspenso:'Suspense', deportes:'Deportes', historico:'Histórico', escolar:'Escolar', 'artes-marciales':'Artes marciales', supervivencia:'Supervivencia', animacion:'Animación', musica:'Música' };
+const L_GEN = { accion:'Acción', aventura:'Aventura', romance:'Romance', fantasia:'Fantasía', 'ciencia-ficcion':'Ciencia ficción', terror:'Terror', comedia:'Comedia', misterio:'Misterio', drama:'Drama', suspenso:'Suspense', deportes:'Deportes', historico:'Histórico', escolar:'Escolar', 'artes-marciales':'Artes marciales', supervivencia:'Supervivencia', animacion:'Animación', musica:'Música', cultivo:'Cultivo', xianxia:'Xianxia', wuxia:'Wuxia', dioses:'Dioses', mitologia:'Mitología', militar:'Militar', demonios:'Demonios' };
 
 /* ---------------- iconos ---------------- */
 const I = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
@@ -63,8 +63,12 @@ const markCurrent = path => $$('[data-path]').forEach(a => a.getAttribute('data-
 /* ---------------- catálogo ---------------- */
 const Catalog = {
   mode: null, manifest: null, items: [], issues: [],
-  async load() {
+  async load() { // single-flight: llamadas concurrentes comparten la MISMA promesa de carga
     if (this.items.length) return this.items;
+    this._p ||= this._doLoad();
+    return this._p;
+  },
+  async _doLoad() {
     try {
       const man = await (await fetch('public/data/nx-manifest.json')).json();
       const first = await (await fetch('public/data/nx-index-00.json')).json();
@@ -101,15 +105,19 @@ const Catalog = {
         }
         return this._buckets.get(key)[id] || null;
       }
-      try { return await (await fetch(`public/data/nx-details/${detailName(id)}.json`)).json(); }
-      catch { return null; }
+      this._details ||= new Map(); // caché de fichas: no repetir descargas (FIX-10)
+      if (this._details.has(id)) return this._details.get(id);
+      try {
+        const d = await (await fetch(`public/data/nx-details/${detailName(id)}.json`)).json();
+        this._details.set(id, d); return d;
+      } catch { this._details.set(id, null); return null; }
     }
     const it = this.items.find(i => i.id === id);
     return it ? { ...it, ev: {}, src: [] } : null;
   },
   counts() { return this.manifest?.conteos || null; },
   search(q) { q = q.trim().toLowerCase(); if (!q) return [];
-    return this.items.filter(i => i.t.toLowerCase().includes(q)).sort(byU); },
+    return this.items.filter(i => (i.t + ' ' + (i.alt || []).join(' ') + ' ' + (i.g || []).map(g => L_GEN[g] || g).join(' ')).toLowerCase().includes(q)).sort(byU); },
   genresOf(list) { const m = new Map(); for (const i of list) for (const g of i.g || []) m.set(g, (m.get(g) || 0) + 1); return [...m.entries()].sort((a,b)=>b[1]-a[1]); },
 };
 
@@ -207,22 +215,28 @@ function bindFav(root) {
 }
 
 /* ---------------- vistas ---------------- */
-/* rejilla paginada: nunca más de CAP tarjetas en el DOM (30k títulos sin colgar el TV Box) */
-const GRID_CAP = 240;
+/* rejilla paginada incremental (FIX-07): "Cargar más" AÑADE el siguiente bloque al DOM
+   en bloques de 60, sin reconstruir las tarjetas ya renderizadas. */
+const GRID_CAP = 240, GRID_BLOCK = 60;
 function fillGrid(grid, list, emptyMsg) {
-  const drawN = n => {
-    grid.replaceChildren(...list.slice(0, n).map(i => card(i)));
-    const old = grid.querySelector('[data-more]'); if (old) old.remove();
-    if (!list.length) { grid.innerHTML = `<div class="nx-empty" style="grid-column:1/-1">${emptyMsg}</div>`; return; }
-    if (list.length > n) {
+  grid.replaceChildren();
+  if (!list.length) { grid.innerHTML = `<div class="nx-empty" style="grid-column:1/-1">${emptyMsg}</div>`; return; }
+  let rendered = 0;
+  const renderMore = () => {
+    const target = Math.min(rendered + GRID_CAP, list.length);
+    const frag = document.createDocumentFragment();
+    for (; rendered < target; rendered++) frag.appendChild(card(list[rendered]));
+    const oldBtn = grid.querySelector('[data-more]'); if (oldBtn) oldBtn.remove();
+    grid.appendChild(frag);
+    if (rendered < list.length) {
       const more = document.createElement('button');
       more.className = 'nx-chip'; more.dataset.more = '1'; more.style.gridColumn = '1/-1';
-      more.textContent = `Cargar más (${list.length - n} restantes)`;
-      more.addEventListener('click', () => drawN(n + GRID_CAP));
+      more.textContent = `Cargar más (${list.length - rendered} restantes)`;
+      more.addEventListener('click', renderMore);
       grid.appendChild(more);
     }
   };
-  drawN(Math.min(GRID_CAP, list.length));
+  renderMore();
 }
 const Views = {
   async home(view) {
@@ -480,7 +494,7 @@ const Views = {
         <button class="nx-chip" id="setInstall">Instalar app (PWA)</button>
         <button class="nx-chip" id="setClear">Borrar datos locales (favoritos, progreso, historial)</button>
       </div>
-      <p class="nx-empty" style="text-align:left;padding:18px 0">La sincronización entre dispositivos (cuenta) se activará cuando conectemos el backend; los datos actuales viven solo en este dispositivo.</p>
+      <p class="nx-empty" style="text-align:left;padding:18px 0">${window.NXSync && NXSync.ready() ? 'Sincronización entre dispositivos: configurada y activa.' : 'Sincronización entre dispositivos: no configurada (instrucciones en FASE-9-CIERRE.md). Los datos actuales viven solo en este dispositivo.'}</p>
     </div>`);
     $('#setAutonext', view).addEventListener('click', e => {
       const on = localStorage.getItem('nx.autonext') === '1';
@@ -507,7 +521,9 @@ const Views = {
 };
 
 /* ---------------- router ---------------- */
+let routeSeq = 0;
 async function route() {
+  const seq = ++routeSeq; // guarda de carrera: una navegación lenta no pisa a una más reciente
   const hash = location.hash.slice(1) || '/';
   const [path, query] = hash.split('?');
   markCurrent(path);
@@ -516,6 +532,7 @@ async function route() {
   window.scrollTo(0, 0);
   try {
     await Catalog.load();
+    if (seq !== routeSeq) return; // hay una navegación más reciente en curso
     view.replaceChildren();
     const seg = path.split('/').filter(Boolean);
     if (path === '/')                     await Views.home(view);
