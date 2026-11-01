@@ -5,6 +5,10 @@
    marcado (iniciado / visto), nunca por timeupdate. */
 'use strict';
 
+/* helper propio: '$' vive en el módulo nx.js y NO es visible desde este script clásico
+   (era el motivo de que el player "no hiciera nada": ReferenceError al abrir). */
+const qs = (s, r = document) => r.querySelector(s);
+
 const NXPlayer = {
   el: null, detail: null, ep: null, lang: null,
   styles: `
@@ -87,26 +91,26 @@ const NXPlayer = {
     });
     // el iframe cross-origin sí dispara 'load' (aunque el contenido esté bloqueado):
     // al cargar, ocultamos el estado; si tarda >12 s, ofrecemos reintento.
-    $('iframe', this.el).addEventListener('load', () => {
+    qs('iframe', this.el).addEventListener('load', () => {
       if (this.iframe().src === 'about:blank') return; // carga inicial del documento vacío: no oculta el estado
       clearTimeout(this._to);
-      const st = $('[data-x="status"]', this.el); if (st) st.hidden = true;
+      const st = qs('[data-x="status"]', this.el); if (st) st.hidden = true;
     });
   },
   armStatus() {
     clearTimeout(this._to);
-    const st = $('[data-x="status"]', this.el); if (!st) return;
+    const st = qs('[data-x="status"]', this.el); if (!st) return;
     st.hidden = false;
-    $('[data-x="statustxt"]', st).textContent = 'Conectando con el servidor…';
-    $('[data-x="retry"]', st).hidden = true;
+    qs('[data-x="statustxt"]', st).textContent = 'Conectando con el servidor…';
+    qs('[data-x="retry"]', st).hidden = true;
     this._to = setTimeout(() => {
       if (st.hidden) return;
-      $('[data-x="statustxt"]', st).textContent = 'El servidor tarda en responder (puede estar bloqueado en tu red o caído). Prueba otro servidor de la lista o reintenta:';
-      $('[data-x="retry"]', st).hidden = false;
+      qs('[data-x="statustxt"]', st).textContent = 'El servidor tarda en responder (puede estar bloqueado en tu red o caído). Prueba otro servidor de la lista o reintenta:';
+      qs('[data-x="retry"]', st).hidden = false;
     }, 12000);
   },
   retryServer() {
-    const st = $('[data-x="status"]', this.el); if (st) st.hidden = true;
+    const st = qs('[data-x="status"]', this.el); if (st) st.hidden = true;
     this.iframe().src = this.srvList[this.srvIdx]?.src || 'about:blank';
     this.armStatus();
   },
@@ -120,15 +124,15 @@ const NXPlayer = {
     this.srvIdx = 0; this.srvList = list; this.curEp = ep;
     this.iframe().src = list[0]?.src || 'about:blank';
     this.armStatus();
-    $('[data-x="epinfo"]', this.el).textContent = `Episodio ${ep.number ?? '?'}`;
+    qs('[data-x="epinfo"]', this.el).textContent = `Episodio ${ep.number ?? '?'}`;
     const eps = this.eps(), i = eps.findIndex(e => (e.number ?? e.id) === this.ep);
-    $('[data-x="prev"]', this.el).disabled = i <= 0;
-    $('[data-x="next"]', this.el).disabled = i < 0 || i >= eps.length - 1;
+    qs('[data-x="prev"]', this.el).disabled = i <= 0;
+    qs('[data-x="next"]', this.el).disabled = i < 0 || i >= eps.length - 1;
     this.renderDock();
     if (window.Lib) Lib.saveProgress(this.detail.id, this.ep, null);
   },
   renderDock() {
-    const dock = $('[data-x="dock"]', this.el);
+    const dock = qs('[data-x="dock"]', this.el);
     const servers = this.curEp.servers || [];
     const langs = [...new Set(servers.map(s => s.lang || 'sin etiqueta'))];
     const list = servers.filter(s => (s.lang || 'sin etiqueta') === this.lang);
@@ -138,7 +142,7 @@ const NXPlayer = {
       list.map((s, i) => `<button class="nxp__pill" data-srv="${i}" aria-pressed="${i === this.srvIdx}" title="${String(s.src).replace(/"/g,'')}">${String(s.name || 'servidor').replace(/[<>&]/g,'') || 'servidor'}</button>`).join('');
   },
   setServer(i) { this.srvIdx = i; this.iframe().src = this.srvList[i]?.src || 'about:blank'; this.armStatus(); this.renderDock(); },
-  iframe() { return $('iframe', this.el); },
+  iframe() { return qs('iframe', this.el); },
   step(d) {
     const eps = this.eps(), i = eps.findIndex(e => (e.number ?? e.id) === this.ep);
     const n = eps[i + d]; if (n) this.play(n);
