@@ -1,16 +1,9 @@
-/* NEXORA — sw.js · Service Worker (Fase 6, PWA)
-   Datos (catálogo nx-*, details): network-first (siempre fresco, cae a caché offline).
-   Assets de la app: cache-first. Imágenes TMDB: runtime cache con límite. */
+/* NEXORA v2 — Service Worker (estructura plana) */
 'use strict';
-const VERSION = 'nexora-v5';
-const CORE = [
-  './', 'index.html',
-  'assets/css/tokens.css', 'assets/css/app.css',
-  'assets/js/nx.js', 'assets/js/nx-player.js',
-  'manifest.webmanifest',
-];
-const IMG_CACHE = VERSION + '-img';
-const IMG_LIMIT = 300;
+const VERSION = 'nexora-v1';
+const CORE = ['./', 'index.html', 'nexora.css', 'nexora.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
+const IMG = VERSION + '-img';
+const IMG_LIMIT = 400;
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
@@ -22,8 +15,8 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  if (url.origin !== location.origin) { // imágenes externas (TMDB…): runtime cache
-    e.respondWith(caches.open(IMG_CACHE).then(async c => {
+  if (url.origin !== location.origin) {
+    e.respondWith(caches.open(IMG).then(async c => {
       const hit = await c.match(req);
       if (hit) return hit;
       const res = await fetch(req);
