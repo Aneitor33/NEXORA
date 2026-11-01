@@ -2,7 +2,7 @@
    Datos (catálogo nx-*, details): network-first (siempre fresco, cae a caché offline).
    Assets de la app: cache-first. Imágenes TMDB: runtime cache con límite. */
 'use strict';
-const VERSION = 'nexora-v4';
+const VERSION = 'nexora-v5';
 const CORE = [
   './', 'index.html',
   'assets/css/tokens.css', 'assets/css/app.css',
