@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-31T21:45:50.729Z",
+  "generatedAt": "2026-11-01T00:39:29.112Z",
   "sources": {
     "donghualife": {
       "tag": "donghualife",
@@ -9,14 +9,38 @@
       "actual": 422,
       "syncedAt": "2026-10-31T21:45:50.550Z",
       "estado": "ACEPTADO",
-      "generosSinMapear": [],
-      "generosSaturadosIgnorados": [
-        "#NaN"
+      "generosSinMapear": [
+        "Harem",
+        "Lucha",
+        "Cultivación",
+        "Reencarnación",
+        "Shonen",
+        "Superpoderes",
+        "Psicológico",
+        "Sucesos de la Vida",
+        "Por Definir",
+        "Magia",
+        "Vampiros",
+        "Viaje a Otro Mundo",
+        "Comida",
+        "Videojuegos",
+        "Seinen",
+        "Juegos",
+        "Zombis",
+        "Ecchi",
+        "Mechas",
+        "Shojo",
+        "Harem Inverso",
+        "Música",
+        "Idols",
+        "Venganza"
       ],
+      "generosSaturadosIgnorados": [],
       "servidores": {
         "serversEmpty": 0,
-        "variantA": 0,
-        "variantB": 46627
+        "serversInvalidUrl": 0,
+        "variantA": 46627,
+        "variantB": 0
       },
       "conGeneresPct": 96.7
     },
@@ -30,12 +54,23 @@
       "estado": "ACEPTADO",
       "generosSinMapear": [],
       "generosSaturadosIgnorados": [
-        "#NaN"
+        "Comedy",
+        "Crime",
+        "Drama",
+        "Family",
+        "Mystery",
+        "Sci-Fi & Fantasy",
+        "Action & Adventure",
+        "Adventure",
+        "Fantasy",
+        "Romance",
+        "War & Politics"
       ],
       "servidores": {
         "serversEmpty": 0,
-        "variantA": 0,
-        "variantB": 4928
+        "serversInvalidUrl": 0,
+        "variantA": 4928,
+        "variantB": 0
       },
       "conGeneresPct": 100
     },
@@ -55,6 +90,7 @@
       "generosSaturadosIgnorados": [],
       "servidores": {
         "serversEmpty": 0,
+        "serversInvalidUrl": 0,
         "variantA": 0,
         "variantB": 0
       },
@@ -83,7 +119,7 @@
   "rechazados": [],
   "titulosInvalidosOmitidos": 1,
   "enriquecimiento": {
-    "shape": "object",
-    "entries": 3
+    "shape": "ok",
+    "entries": 2
   }
 }
