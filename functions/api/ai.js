@@ -40,11 +40,11 @@ const limited = ip => {
 };
 const json = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
 
-async function askGemini(query, cat) { return askGeminiLike('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent', process.env.GEMINI_API_KEY, query, cat, 'Gemini'); }
-async function askGroq(query, cat) {
+async function askGemini(query, cat, key) { return askGeminiLike('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent', key, query, cat, 'Gemini'); }
+async function askGroq(query, cat, key) {
   const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
     body: JSON.stringify({ model: 'llama-3.3-70b-versatile', temperature: 0.4,
       messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content: userMsg(query, cat) }] }),
   });
@@ -105,9 +105,11 @@ export async function onRequestPost({ request, env, waitUntil }) {
         .filter(x => x.s > 0).sort((a, b) => b.s - a.s).slice(0, 600).map(x => x.i)
     : brief.slice(0, 600);
 
+  const GK = env.GEMINI_API_KEY || process.env.GEMINI_API_KEY;   // FIX-06: env (Cloudflare) primero; process.env como fallback
+  const QK = env.GROQ_API_KEY || process.env.GROQ_API_KEY;
   const providers = [
-    process.env.GEMINI_API_KEY ? (q, c) => askGemini(q, c) : null,
-    process.env.GROQ_API_KEY ? (q, c) => askGroq(q, c) : null,
+    GK ? (q, c) => askGemini(q, c, GK) : null,
+    QK ? (q, c) => askGroq(q, c, QK) : null,
     env.AI ? (q, c) => askWorkersAI(env, q, c) : null,
   ].filter(Boolean);
   if (!providers.length) return json({ error: 'IA no configurada: añade GEMINI_API_KEY o GROQ_API_KEY como secreto del proyecto (Settings → Environment variables).' }, 503);
