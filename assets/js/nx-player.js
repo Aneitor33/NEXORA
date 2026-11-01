@@ -68,7 +68,7 @@ const NXPlayer = {
         <button class="nxp__btn" data-x="full">Pantalla completa</button>
       </div>
       <div class="nxp__stage">
-        <iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="no-referrer"></iframe>
+        <iframe allow="autoplay; fullscreen *; encrypted-media; picture-in-picture" allowfullscreen webkitallowfullscreen mozallowfullscreen loading="lazy"></iframe>
         <div class="nxp__status" data-x="status"><span data-x="statustxt">Conectando con el servidor…</span><button class="nxp__btn" data-x="retry" hidden>Reintentar</button></div>
       </div>
       <div class="nxp__dock" data-x="dock"></div>`;
@@ -88,6 +88,7 @@ const NXPlayer = {
     // el iframe cross-origin sí dispara 'load' (aunque el contenido esté bloqueado):
     // al cargar, ocultamos el estado; si tarda >12 s, ofrecemos reintento.
     $('iframe', this.el).addEventListener('load', () => {
+      if (this.iframe().src === 'about:blank') return; // carga inicial del documento vacío: no oculta el estado
       clearTimeout(this._to);
       const st = $('[data-x="status"]', this.el); if (st) st.hidden = true;
     });
